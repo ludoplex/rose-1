@@ -59,8 +59,8 @@ def print_page  (page,  page_num):
 
 def main():
     global pdf
-    page=[None for i in range(4)]
-    outline=[None for i in range(4)]
+    page = [None for _ in range(4)]
+    outline = [None for _ in range(4)]
 
     fname=os.path.realpath(sys.argv[0])
     fname=fname[:fname.rfind('.')]+'.pdf'
@@ -97,7 +97,7 @@ def main():
     outline[1] = HPDF_CreateOutline (pdf, root, "page2", NULL)
 
     # create outline with test which is ISO8859-2 encoding
-    #outline[2] = HPDF_CreateOutline (pdf, root, "ISO8859-2 text 釉罩棕?,
+    #outline[2] = HPDF_CreateOutline (pdf, root, "ISO8859-2 text éç˝ŠćŁ?,
     #                HPDF_GetEncoder (pdf, "ISO8859-2"))
 
     # create destination objects on each pages

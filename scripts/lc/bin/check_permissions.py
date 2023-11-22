@@ -39,8 +39,12 @@ class Checker(object):
             epilog='You only need to provide enough of each argument name to '
                    'make it unique. e.g. --i and --input_file are equivalent.  '
         )
-        parser.add_argument('-v', '--version', action='version',
-                            version='%(prog)s ' + VERSION_STRING)
+        parser.add_argument(
+            '-v',
+            '--version',
+            action='version',
+            version=f'%(prog)s {VERSION_STRING}',
+        )
         parser.add_argument('-c', '--count_only', action='store_true',
                             help='Just count what would be checked, but don\'t do checks')
         parser.add_argument('-d', '--debug', action='store_true',
@@ -59,10 +63,7 @@ class Checker(object):
     def run(self):
         self._process_args()
         self._do_check()
-        if self.failed:
-            return 1
-        else:
-            return 0
+        return 1 if self.failed else 0
 
     def _process_args(self):
         self._args = self._parser.parse_args()
@@ -70,9 +71,11 @@ class Checker(object):
     def _do_check(self):
         """ Walks all subdirectories and files, checking each"""
         if self._args.count_only:
-            print('Would check permissions for "%s" (counting only)' % self._args.installation_path)
+            print(
+                f'Would check permissions for "{self._args.installation_path}" (counting only)'
+            )
         else:
-            print('Checking permissions for "%s"' % self._args.installation_path)
+            print(f'Checking permissions for "{self._args.installation_path}"')
         if self._args.debug:
             print ('(Debug is on)')
         for root, dirs, files in os.walk(self._args.installation_path):
@@ -113,29 +116,25 @@ class Checker(object):
                 st = os.stat(path)
                 int_mode = st.st_mode
                 if self._args.debug:
-                    if self._is_dir(st):
-                        prefix = 'd'
-                    else:
-                        prefix = ' '
-                    print('%s: %s %s' % (prefix, int_mode, path))
+                    prefix = 'd' if self._is_dir(st) else ' '
+                    print(f'{prefix}: {int_mode} {path}')
                 self._check_write_is_off(path, int_mode)
                 self._check_others_match_owner(path, int_mode)
-            # Log any OS (hopefully file system) exceptions and return normally:
             except OSError:
                 self.exception_count += 1
                 e = sys.exc_info()
-                print('EXCEPTION: %s; %s' % (e[0], e[1]))
+                print(f'EXCEPTION: {e[0]}; {e[1]}')
 
     def _check_write_is_off(self, path, mode):
         if self._args.check_write:
             if self._write_enabled(mode):
                 self.unwanted_write_count += 1
-                print('ERROR - has non-owner write permission: "%s"' % path)
+                print(f'ERROR - has non-owner write permission: "{path}"')
 
     def _check_others_match_owner(self, path, mode):
         if not self._others_match_owner(mode):
             self.non_matching_count += 1
-            print('ERROR - others permissions do not match owner permission: "%s"' % path)
+            print(f'ERROR - others permissions do not match owner permission: "{path}"')
 
     @staticmethod
     def _write_enabled(mode):
@@ -147,12 +146,6 @@ class Checker(object):
         orr = bool(mode & stat.S_IROTH)
         ux = bool(mode & stat.S_IXUSR)
         ox = bool(mode & stat.S_IXOTH)
-        if False:
-            ur_eq_orr = ur == orr
-            ux_eq_ox = ux == ox
-            both_match = ur_eq_orr & ux_eq_ox
-            print ('ur: %s, or: %s, ur_eq_orr: %s; ux: %s, ox: %s, ux_eq_ox: %s; both_match: %s' %
-                   (ur, orr, ur_eq_orr, ux, ox, ux_eq_ox, both_match))
         return bool((ur == orr) & (ux == ox))
 
     @staticmethod

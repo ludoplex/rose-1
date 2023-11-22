@@ -11,16 +11,13 @@ import subprocess
 import multiprocessing
 
 def enforce_abspath(path, bdir):
-	if os.path.isabs(path):
-		return path
-	else:
-		return os.path.realpath(bdir + '/' + path)
+	return path if os.path.isabs(path) else os.path.realpath(f'{bdir}/{path}')
 
 def normalize_translation_unit(trans_unit):
 	assert os.path.isabs(trans_unit['directory']), 'Found a "command object" where the workdir ("directory" field) is a relative path.'
 
 	# if argument field is not provided build it from commend field
-	if not 'arguments' in trans_unit:
+	if 'arguments' not in trans_unit:
 		assert 'command' in trans_unit, 'Found a compile command with neither "command" nor "arguments" filed.'
 		trans_unit.update({ 'arguments' : map(lambda s: s.strip() , filter(lambda s: len(s) > 0, trans_unit['command'].split(' '))) })
 
@@ -39,7 +36,16 @@ def normalize_translation_unit(trans_unit):
 		trans_unit['arguments'][i] = trans_unit['file']
 
 	# make all include path absolute)
-	trans_unit.update({ 'arguments' : map(lambda arg: '-I{}'.format(enforce_abspath(arg[2:], trans_unit['directory'])) if arg.startswith('-I') else arg, trans_unit['arguments']) })
+	trans_unit.update(
+		{
+			'arguments': map(
+				lambda arg: f"-I{enforce_abspath(arg[2:], trans_unit['directory'])}"
+				if arg.startswith('-I')
+				else arg,
+				trans_unit['arguments'],
+			)
+		}
+	)
 	trans_unit.update({ 'incpath' : map(lambda arg: arg[2:], filter(lambda s: s.startswith('-I'), trans_unit['arguments'])) })
 
 	# figure the output file (AND make it absolute)
@@ -61,7 +67,7 @@ def remove_duplicate_translation_units(comp_db):
 			unit_list_map[key].append(unit)
 		else:
 			unit_list_map[key] = [unit,]
-	result_comp_db = list()
+	result_comp_db = []
 	for unit_list in unit_list_map.itervalues():
 		assert len(unit_list) > 0
 		result_comp_db.append(unit_list[0])
@@ -71,7 +77,7 @@ def normalize_compilation_database(comp_db):
         return remove_duplicate_translation_units(map(normalize_translation_unit, comp_db))
 
 def transform_original_args(args, filter_args, replace_args):
-	args = filter(lambda arg: not arg in filter_args, args)
+	args = filter(lambda arg: arg not in filter_args, args)
 	args = map(lambda arg: replace_args[arg] if arg in replace_args else arg, args)
 	return args
 
@@ -135,7 +141,7 @@ def map_tool(job):
 	log_progress(0, len(workload), 0)
 
 	if job['config']['nprocs'] == 0:
-		results = list()
+		results = []
 		for kwargs in workload:
 			results.append(apply_tool(**kwargs))
 			elapsed_time = time.time() - start_time	
@@ -160,31 +166,34 @@ def map_tool(job):
 	return job
 
 def split_if_needed(args, database):
-	if  args.split > 1:
-		parts = dict()
-		# Make the fragments:
-		frag_numbers = range(1, args.split + 1)
-		for index in frag_numbers:
-			parts[index] = list()
-		# Fill the fragments:
-		which_frag=1
-		for unit in database:
-			parts[which_frag].append(unit)
-			which_frag += 1
-			if which_frag > args.split:
-				which_frag = 1
-		# Write the fragments to files:
-		db_path, db_filename=os.path.split(args.database_path)
-		db_basename, db_ext = db_filename.split('.')
-		print ('Splitting {} ({} entries) into {} files'.format(args.database_path, len(database), args.split))
-		for index in frag_numbers:
-			part_filename = db_basename + '_' + str(index) + '.' + db_ext
-			part_path = os.path.join(db_path, part_filename)
-			print ('Creating {} with {} entries'.format(part_path, len(parts[index])))
-			with open(part_path, 'w') as part_file:
-				json.dump(parts[index], part_file)
-		print('Exiting')
-		exit(0)
+	if args.split <= 1:
+		return
+	parts = dict()
+	# Make the fragments:
+	frag_numbers = range(1, args.split + 1)
+	for index in frag_numbers:
+		parts[index] = []
+	# Fill the fragments:
+	which_frag=1
+	for unit in database:
+		parts[which_frag].append(unit)
+		which_frag += 1
+		if which_frag > args.split:
+			which_frag = 1
+	# Write the fragments to files:
+	db_path, db_filename=os.path.split(args.database_path)
+	db_basename, db_ext = db_filename.split('.')
+	print(
+		f'Splitting {args.database_path} ({len(database)} entries) into {args.split} files'
+	)
+	for index in frag_numbers:
+		part_filename = f'{db_basename}_{str(index)}.{db_ext}'
+		part_path = os.path.join(db_path, part_filename)
+		print(f'Creating {part_path} with {len(parts[index])} entries')
+		with open(part_path, 'w') as part_file:
+			json.dump(parts[index], part_file)
+	print('Exiting')
+	exit(0)
 
 def truncate_as_needed(args, database):
 	"""Remove units fom the database not between start_at and end_at.
@@ -193,8 +202,9 @@ def truncate_as_needed(args, database):
 	last = args.end_at
 	if first > 1 or last < len(database):
 		truncated_size = last - first + 1
-		print ('Truncating {} database entries down to {} entries, starting at {}, ending at {}'.
-			   format(len(database), truncated_size, first, last))
+		print(
+			f'Truncating {len(database)} database entries down to {truncated_size} entries, starting at {first}, ending at {last}'
+		)
 	return database[first - 1 : last]
 
 def build_parser():

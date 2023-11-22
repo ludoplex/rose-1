@@ -11,21 +11,27 @@ import traceback
 import multiprocessing
 
 def prefix_path(path, prefixes):
-	for (tag,prefix) in sorted(prefixes.iteritems(), key=lambda x: x[1], reverse=True):
-		if path.startswith(prefix):
-			return tag + path[len(prefix):]
-	return path
+	return next(
+		(
+			tag + path[len(prefix) :]
+			for tag, prefix in sorted(
+				prefixes.iteritems(), key=lambda x: x[1], reverse=True
+			)
+			if path.startswith(prefix)
+		),
+		path,
+	)
 
 def write_html_head(F, report, title, rscdir):
 	F.write('<head>\n')
 
-	F.write('<link rel="stylesheet" href="{}/css/bootstrap.min.css">\n\n'.format(rscdir))
+	F.write(f'<link rel="stylesheet" href="{rscdir}/css/bootstrap.min.css">\n\n')
 
-	F.write('<link rel="stylesheet" href="{}/css/comp_db.css">\n\n'.format(rscdir))
+	F.write(f'<link rel="stylesheet" href="{rscdir}/css/comp_db.css">\n\n')
 
 	F.write('<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">\n\n')
 
-	F.write('<title>{}</title>\n\n'.format(title))
+	F.write(f'<title>{title}</title>\n\n')
 
 	F.write('</head>\n')
 
@@ -49,7 +55,9 @@ def write_navbar(F, report, title):
 	for (tu_id, tu_report) in enumerate(report['trans-units']):
 		filename = prefix_path(tu_report['file'], prefixes)
 		style = 'btn-dark' if 'exception' in tu_report else ('btn-success' if tu_report['returncode'] == 0 else 'btn-danger')
-		F.write('          <a class="btn {} page-scroll" href="#translation_unit_{}" ><span>{}</span></a><br/>\n'.format(style, tu_id,filename))
+		F.write(
+			f'          <a class="btn {style} page-scroll" href="#translation_unit_{tu_id}" ><span>{filename}</span></a><br/>\n'
+		)
 	F.write('        </div>\n')
 	F.write('      </li>\n')
 	F.write('    </ul>\n')
@@ -193,15 +201,21 @@ def write_translation_unit_report(F, report, tu_id):
 	filename = prefix_path(tu_report['file'], prefixes)
 	workdir = prefix_path(tu_report['directory'], prefixes)
 
-	F.write('<section class="section" id="translation_unit_{}">\n'.format(tu_id))
+	F.write(f'<section class="section" id="translation_unit_{tu_id}">\n')
 	F.write('  <div class="container-fluid">\n')
 #	F.write('    <div class="card w-20"></div>\n')
-	F.write('    <div class="card w-50 mx-auto bg-{}">\n'.format(style))
+	F.write(f'    <div class="card w-50 mx-auto bg-{style}">\n')
 	F.write('      <div class="card-body">\n')
 	F.write('        <table border=0 align=center>\n')
-	F.write('          <tr><td><h5>File:</h5>          </td><td> </td><td><h3>{}</h3></td></tr>\n'.format(filename))
-	F.write('          <tr><td><h5>Work Directory:</h5></td><td> </td><td><h3>{}</h3></td></tr>\n'.format(workdir))
-	F.write('          <tr><td></td><td colspan=2><h5>Return code is <b>{}</b></h5></td></tr>\n'.format(tu_report['returncode']))
+	F.write(
+		f'          <tr><td><h5>File:</h5>          </td><td> </td><td><h3>{filename}</h3></td></tr>\n'
+	)
+	F.write(
+		f'          <tr><td><h5>Work Directory:</h5></td><td> </td><td><h3>{workdir}</h3></td></tr>\n'
+	)
+	F.write(
+		f"          <tr><td></td><td colspan=2><h5>Return code is <b>{tu_report['returncode']}</b></h5></td></tr>\n"
+	)
 	F.write('          <tr><td></td><td colspan=2><h5>Processed in <b>{:.1f}</b> seconds</h5></td></tr>\n'.format(tu_report['elapsed']))
 	F.write('        </table>\n')
 	F.write('      </div>\n')
@@ -219,13 +233,17 @@ def write_translation_unit_report(F, report, tu_id):
 	F.write('            <a class="nav-link active btn-{0}" data-toggle="collapse" href="#translation_unit_{1}_ocl_body" aria-expanded="false" aria-controls="translation_unit_{1}_ocl_body">Original Command Line</a>\n'.format(style, tu_id))
 	F.write('          </li>\n')
 	F.write('          <li class="nav-item">\n')
-	F.write('            <a class="nav-link js-tooltip js-copy" data-toggle="tooltip" data-placement="right" data-copy="translation_unit_{}_ocl_pre" title="Copy to clipboard">\n'.format(tu_id))
+	F.write(
+		f'            <a class="nav-link js-tooltip js-copy" data-toggle="tooltip" data-placement="right" data-copy="translation_unit_{tu_id}_ocl_pre" title="Copy to clipboard">\n'
+	)
 	F.write('              <svg class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z" /></svg>\n')
 	F.write('            </a>\n')
 	F.write('          </li>\n')
 	F.write('        </ul>\n')
 	F.write('      </div>\n')
-	F.write('      <div class="collapse" id="translation_unit_{}_ocl_body">\n'.format(tu_id))
+	F.write(
+		f'      <div class="collapse" id="translation_unit_{tu_id}_ocl_body">\n'
+	)
 	F.write('        <div class="card-body">\n')
 	F.write('          <pre id="translation_unit_{}_ocl_pre">{}</pre>\n'.format(tu_id, ' \\\n         -'.join(ocl.split(' -'))))
 	F.write('        </div>\n')
@@ -243,13 +261,17 @@ def write_translation_unit_report(F, report, tu_id):
 	F.write('            <a class="nav-link active btn-{0}" data-toggle="collapse" href="#translation_unit_{1}_tcl_body" aria-expanded="false" aria-controls="translation_unit_{1}_tcl_body">Tool Command Line</a>\n'.format(style, tu_id))
 	F.write('          </li>\n')
 	F.write('          <li class="nav-item">\n')
-	F.write('            <a class="nav-link js-tooltip js-copy" data-toggle="tooltip" data-placement="right" data-copy="translation_unit_{}_tcl_pre" title="Copy to clipboard">\n'.format(tu_id))
+	F.write(
+		f'            <a class="nav-link js-tooltip js-copy" data-toggle="tooltip" data-placement="right" data-copy="translation_unit_{tu_id}_tcl_pre" title="Copy to clipboard">\n'
+	)
 	F.write('              <svg class="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M17,9H7V7H17M17,13H7V11H17M14,17H7V15H14M12,3A1,1 0 0,1 13,4A1,1 0 0,1 12,5A1,1 0 0,1 11,4A1,1 0 0,1 12,3M19,3H14.82C14.4,1.84 13.3,1 12,1C10.7,1 9.6,1.84 9.18,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3Z" /></svg>\n')
 	F.write('            </a>\n')
 	F.write('          </li>\n')
 	F.write('        </ul>\n')
 	F.write('      </div>\n')
-	F.write('      <div class="collapse" id="translation_unit_{}_tcl_body">\n'.format(tu_id))
+	F.write(
+		f'      <div class="collapse" id="translation_unit_{tu_id}_tcl_body">\n'
+	)
 	F.write('        <div class="card-body">\n')
 	F.write('          <pre id="translation_unit_{}_tcl_pre">{}</pre>\n'.format(tu_id, ' \\\n         -'.join(tcl.split(' -'))))
 	F.write('        </div>\n')
@@ -267,9 +289,11 @@ def write_translation_unit_report(F, report, tu_id):
 		F.write('          </li>\n')
 		F.write('        </ul>\n')
 		F.write('      </div>\n')
-		F.write('      <div class="collapse" id="translation_unit_{}_out_body">\n'.format(tu_id))
+		F.write(
+			f'      <div class="collapse" id="translation_unit_{tu_id}_out_body">\n'
+		)
 		F.write('        <div class="card-body">\n')
-		F.write('          <pre>{}</pre>\n'.format(tu_report['out'].encode('utf-8')))
+		F.write(f"          <pre>{tu_report['out'].encode('utf-8')}</pre>\n")
 		F.write('        </div>\n')
 		F.write('      </div>\n')
 		F.write('    </div>\n')
@@ -285,9 +309,11 @@ def write_translation_unit_report(F, report, tu_id):
 		F.write('          </li>\n')
 		F.write('        </ul>\n')
 		F.write('      </div>\n')
-		F.write('      <div class="collapse" id="translation_unit_{}_err_body">\n'.format(tu_id))
+		F.write(
+			f'      <div class="collapse" id="translation_unit_{tu_id}_err_body">\n'
+		)
 		F.write('        <div class="card-body">\n')
-		F.write('          <pre>{}</pre>\n'.format(tu_report['err'].encode('utf-8')))
+		F.write(f"          <pre>{tu_report['err'].encode('utf-8')}</pre>\n")
 		F.write('        </div>\n')
 		F.write('      </div>\n')
 		F.write('    </div>\n')
@@ -303,9 +329,11 @@ def write_translation_unit_report(F, report, tu_id):
 		F.write('          </li>\n')
 		F.write('        </ul>\n')
 		F.write('      </div>\n')
-		F.write('      <div class="collapse" id="translation_unit_{}_exception_body">\n'.format(tu_id))
+		F.write(
+			f'      <div class="collapse" id="translation_unit_{tu_id}_exception_body">\n'
+		)
 		F.write('        <div class="card-body">\n')
-		F.write('          <pre>{}</pre>\n'.format(tu_report['exception'].encode('utf-8')))
+		F.write(f"          <pre>{tu_report['exception'].encode('utf-8')}</pre>\n")
 		F.write('        </div>\n')
 		F.write('      </div>\n')
 		F.write('    </div>\n')
@@ -322,7 +350,7 @@ def write_translation_unit_report(F, report, tu_id):
 		F.write('        </ul>\n')
 		F.write('      </div>\n')
 		F.write('      <div class="collapse {2}" id="translation_unit_{0}_{1}_body">\n'.format(tu_id, addon['tag'], addon['class']))
-		F.write('        <div class="card-body">{}</div>\n'.format(addon['html']))
+		F.write(f"""        <div class="card-body">{addon['html']}</div>\n""")
 		F.write('      </div>\n')
 		F.write('    </div>\n')
 		F.write('    </div>\n')
@@ -350,13 +378,13 @@ def write_html_body(F, report, title):
 	F.write('</body>\n')
 
 def write_scripts(F, report, rscdir):
-	F.write('<script src="{}/js/jquery-3.3.1.slim.min.js"></script>\n'.format(rscdir))
-	F.write('<script src="{}/js/popper.min.js"></script>\n'.format(rscdir))
-	F.write('<script src="{}/js/bootstrap.min.js"></script>\n\n'.format(rscdir))
+	F.write(f'<script src="{rscdir}/js/jquery-3.3.1.slim.min.js"></script>\n')
+	F.write(f'<script src="{rscdir}/js/popper.min.js"></script>\n')
+	F.write(f'<script src="{rscdir}/js/bootstrap.min.js"></script>\n\n')
 
-	F.write('<script src="{}/js/svg-pan-zoom.min.js"></script>\n'.format(rscdir))
+	F.write(f'<script src="{rscdir}/js/svg-pan-zoom.min.js"></script>\n')
 
-	F.write('<script src="{}/js/comp_db.js"></script>\n'.format(rscdir))
+	F.write(f'<script src="{rscdir}/js/comp_db.js"></script>\n')
 
 def generate_html(F, report, title, rscdir):
 	F.write('<!doctype html>\n')
@@ -372,50 +400,49 @@ def addons_apply_graphviz_worker(addon_id, title, max_size, timeout, tu_id, fid,
 	html = ''
 	code = None
 
-	if not os.path.isfile('{}.svg'.format(fpath)): # TODO SVG should be more recent than DOT
-		if not os.path.isfile(fpath):
-			html = '<p>Cannot find the GraphViz file:</p><pre>{}</pre>'.format(fpath)
-			code = 'danger'
-		elif not max_size is None and fsize > max_size:
-			html = '<p>Provided GraphViz file is {} which is larger than the limit of {}. You can try manually:</p><pre>{}</pre>'.format(fsize, max_size, fpath)
-			code = 'warning'
-		else:
-			start_time = time.time()
-
-			dot_cmdline = [ 'dot' , '-Tsvg' , fpath , '-o' , '{}.svg'.format(fpath) ]
-			if not timeout is None:
-				dot_cmdline = [ 'timeout' , timeout ] + dot_cmdline
-			if 'dot-args' in kwargs:
-				assert isinstance(kwargs['dot-args'], list)
-				dot_cmdline += kwargs['dot-args']
-			dot_proc = subprocess.Popen(dot_cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			out, err = dot_proc.communicate()
-			rc = dot_proc.returncode
-
-			elapsed_time = time.time() - start_time
-
-			if rc == 124:
-				html = '<p>Timeout after {:.1f} seconds while rendering the GraphViz document.</p><p>Command Line:</p><pre>{}</pre><p>Standard Error:</p><pre>{}</pre>'.format(elapsed_time, ' '.join(dot_cmdline), err)
-				code = 'warning'
-			elif rc != 0:
-				html = '<p>The GraphViz rendering application `dot` returned the non-zero code {} after {} seconds.</p><pre>{}</pre>'.format(rc, elapsed_time, err)
-				code = 'danger'
-			else:
-				html = '<p>SVG generated in {:.1f} seconds.</p>'.format(elapsed_time)
-	else:
+	if os.path.isfile(f'{fpath}.svg'):
 		html = '<p>SVG was already present.</p>'
 
+	elif not os.path.isfile(fpath):
+		html = f'<p>Cannot find the GraphViz file:</p><pre>{fpath}</pre>'
+		code = 'danger'
+	elif max_size is not None and fsize > max_size:
+		html = f'<p>Provided GraphViz file is {fsize} which is larger than the limit of {max_size}. You can try manually:</p><pre>{fpath}</pre>'
+		code = 'warning'
+	else:
+		start_time = time.time()
+
+		dot_cmdline = ['dot', '-Tsvg', fpath, '-o', f'{fpath}.svg']
+		if timeout is not None:
+			dot_cmdline = [ 'timeout' , timeout ] + dot_cmdline
+		if 'dot-args' in kwargs:
+			assert isinstance(kwargs['dot-args'], list)
+			dot_cmdline += kwargs['dot-args']
+		dot_proc = subprocess.Popen(dot_cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		out, err = dot_proc.communicate()
+		rc = dot_proc.returncode
+
+		elapsed_time = time.time() - start_time
+
+		if rc == 0:
+			html = '<p>SVG generated in {:.1f} seconds.</p>'.format(elapsed_time)
+		elif rc == 124:
+			html = '<p>Timeout after {:.1f} seconds while rendering the GraphViz document.</p><p>Command Line:</p><pre>{}</pre><p>Standard Error:</p><pre>{}</pre>'.format(elapsed_time, ' '.join(dot_cmdline), err)
+			code = 'warning'
+		else:
+			html = f'<p>The GraphViz rendering application `dot` returned the non-zero code {rc} after {elapsed_time} seconds.</p><pre>{err}</pre>'
+			code = 'danger'
 	if code is None:
-		html = '<object class="svg_zoom_pan" type="image/svg+xml" data="file://{}.svg">{}</object>{}'.format(fpath, title, html)
+		html = f'<object class="svg_zoom_pan" type="image/svg+xml" data="file://{fpath}.svg">{title}</object>{html}'
 		code = 'success'
 
-	return ( tu_id , {
-	  'tag': 'addon_{}_file_{}'.format(addon_id, fid),
-	  'class' : 'card-svg-object' if code == 'success' else '',
-	  'title' : title,
-	  'html' : html,
-	  'code' : code
-	})
+	return tu_id, {
+		'tag': f'addon_{addon_id}_file_{fid}',
+		'class': 'card-svg-object' if code == 'success' else '',
+		'title': title,
+		'html': html,
+		'code': code,
+	}
 
 def addons_apply_graphviz_worker_helper(kwargs):
 	try:
@@ -423,16 +450,16 @@ def addons_apply_graphviz_worker_helper(kwargs):
 	except Exception as e:
 		type_, value_, traceback_ = sys.exc_info()
 		trace = ''.join(traceback.format_exception(etype=type_, value=value_, tb=traceback_))
-		return ( kwargs['tu_id'] , {
-		  'tag': 'addon_{}_file_{}'.format(kwargs['addon_id'], kwargs['fid']),
-		  'class' : '',
-		  'title' : kwargs['title'],
-		  'html' : 'GraphViz Renderer Exception: <pre>{}</pre>'.format(trace),
-		  'code' : 'dark'
-		})
+		return kwargs['tu_id'], {
+			'tag': f"addon_{kwargs['addon_id']}_file_{kwargs['fid']}",
+			'class': '',
+			'title': kwargs['title'],
+			'html': f'GraphViz Renderer Exception: <pre>{trace}</pre>',
+			'code': 'dark',
+		}
 
 def addons_apply_graphviz(report, addon_id, title, filename, nprocs, max_size=None, timeout=None, **kwargs):
-	workload = list()
+	workload = []
 
 	if '%F' in filename or '%f' in filename or '%F%e' in filename or '%f%e' in filename:
 		for (tu_id,tu_report) in enumerate(report['trans-units']):
@@ -456,7 +483,7 @@ def addons_apply_graphviz(report, addon_id, title, filename, nprocs, max_size=No
 	else:
 		assert False, "NIY!!!" # TODO graphviz file(s) is not dependent on 1 translation unit. It is a global entry
 
-	if len(workload) > 0:
+	if workload:
 		start_time = time.time()
 
 		pool = multiprocessing.Pool(nprocs)
@@ -476,7 +503,7 @@ def addons_apply_graphviz(report, addon_id, title, filename, nprocs, max_size=No
 		sys.stdout.write("\r                                                 \rGraphViz: {}/{} in {:.1f} seconds\n".format(len(results), len(workload), elapsed_time ))
 		sys.stdout.flush()
 	else:
-		results = list()
+		results = []
 
 	for result in results:
 		if result[0] >= 0:
@@ -485,7 +512,7 @@ def addons_apply_graphviz(report, addon_id, title, filename, nprocs, max_size=No
 			assert False, "NIY!!!" # TODO add result to global entries
 
 def addons_apply_json(report, addon_id, title, filename, nprocs, **kwargs):
-	workload = list()
+	workload = []
 
 	if '%F' in filename or '%f' in filename or '%F%e' in filename or '%f%e' in filename:
 		for (tu_id,tu_report) in enumerate(report['trans-units']):
@@ -505,13 +532,15 @@ def addons_apply_json(report, addon_id, title, filename, nprocs, **kwargs):
 			for (fid, ( fpath , fM ) ) in enumerate(tu_files):
 				with open(fpath) as F:
 					data = json.load(F)
-				report['trans-units'][tu_id]['addons'].append({
-				  'tag': 'addon_{}_file_{}'.format(addon_id, fid),
-				  'class' : 'json-data',
-				  'title' : title.replace('%M', fM),
-				  'html' : '<pre>{}</pre>'.format(json.dumps(data, indent=4)),
-				  'code' : 'success'
-				})
+				report['trans-units'][tu_id]['addons'].append(
+					{
+						'tag': f'addon_{addon_id}_file_{fid}',
+						'class': 'json-data',
+						'title': title.replace('%M', fM),
+						'html': '<pre>{}</pre>'.format(json.dumps(data, indent=4)),
+						'code': 'success',
+					}
+				)
 	else:
 		assert False, "NIY!!!" # TODO json file(s) is not dependent on 1 translation unit. It is a global entry
 

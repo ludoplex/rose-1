@@ -9,7 +9,7 @@ import sipconfig
 
 sipcfg = sipconfig.Configuration()
 print("sip_version:%06.0x" % sipcfg.sip_version)
-print("sip_version_str:%s" % sipcfg.sip_version_str)
-print("sip_bin:%s" % sipcfg.sip_bin)
-print("default_sip_dir:%s" % sipcfg.default_sip_dir)
-print("sip_inc_dir:%s" % sipcfg.sip_inc_dir)
+print(f"sip_version_str:{sipcfg.sip_version_str}")
+print(f"sip_bin:{sipcfg.sip_bin}")
+print(f"default_sip_dir:{sipcfg.default_sip_dir}")
+print(f"sip_inc_dir:{sipcfg.sip_inc_dir}")

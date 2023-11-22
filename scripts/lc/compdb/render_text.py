@@ -26,8 +26,8 @@ class KeyValueMapSorted (object):
     """
     def __init__(self):
         self._key_value_map = dict()
-        self._keys = list()
-        self._values = list()
+        self._keys = []
+        self._values = []
         self._sort_needed = False
 
     def count(self):
@@ -44,9 +44,7 @@ class KeyValueMapSorted (object):
     def _sort_if_needed(self):
         if self._sort_needed:
             self._keys.sort()
-            self._values = list()
-            for name in self._keys:
-                self._values.append(self._key_value_map[name])
+            self._values = [self._key_value_map[name] for name in self._keys]
             self._sort_needed = False
 
     def to_value(self, name):
@@ -79,10 +77,10 @@ class KeyCountMapSorted(object):
     """
 
     def __init__(self):
-        self._counts = list()
+        self._counts = []
         self._sort_needed = False
         self._key_count_map = dict()
-        self._keys = list()
+        self._keys = []
 
     def count(self):
         return len(self._keys)
@@ -106,22 +104,21 @@ class KeyCountMapSorted(object):
     def counts_and_keys_by_count(self):
         """Return a list of (count, string) tuples sorted by count, then key.
         """
-        result = list()
+        result = []
         self._sort_if_needed()
         for count in self._counts:
-            for key in self._keys:
-                if self._key_count_map[key] == count:
-                    result.append((count, key))
+            result.extend(
+                (count, key)
+                for key in self._keys
+                if self._key_count_map[key] == count
+            )
         return result
 
     def keys_sorted(self):
         return sorted(self._keys)
 
     def count_for_key(self, key):
-        if key in self._key_count_map:
-            return self._key_count_map[key]
-        else:
-            return 0
+        return self._key_count_map[key] if key in self._key_count_map else 0
 
 # Numbers below are for sort ordering:
 SUCCESS = 'Success'
@@ -173,8 +170,8 @@ class Renderer (object):
         self._parser = None
         self._script_dir = ''
 
-        self._all_main_stderr_lines = list()
-        self._all_stderr_texts = list()
+        self._all_main_stderr_lines = []
+        self._all_stderr_texts = []
         self._first_occurrences_per_error = KeyCountMapSorted()
         self._json_in = None
         self._run_id_to_report_index = dict()
@@ -230,9 +227,9 @@ class Renderer (object):
         script_rel_path = inspect.getframeinfo(inspect.currentframe()).filename
         self._script_dir = os.path.dirname(os.path.abspath(script_rel_path))
 
-        self._logger.debug('self._args: ' + str(self._args))
-        self._logger.debug('self._current_dir: ' + str(self._current_dir))
-        self._logger.debug('self._script_dir: ' + str(self._script_dir))
+        self._logger.debug(f'self._args: {str(self._args)}')
+        self._logger.debug(f'self._current_dir: {str(self._current_dir)}')
+        self._logger.debug(f'self._script_dir: {str(self._script_dir)}')
 
     def total_units(self):
         return len(self.run_reports())
@@ -255,9 +252,10 @@ class Renderer (object):
         try:
             self._json_in = json.load(self._args.in_file)
         except ValueError as e:
-            self._logger.error('Exception {} raised doing json.load on "{}"'.
-                               format('ValueError', self._args.in_file.name))
-            self._logger.error('Message: "{}"'.format(e.message))
+            self._logger.error(
+                f'Exception ValueError raised doing json.load on "{self._args.in_file.name}"'
+            )
+            self._logger.error(f'Message: "{e.message}"')
             self._logger.error('Exiting')
             exit(1)
         self._generate_report()
@@ -305,10 +303,7 @@ class Renderer (object):
             else:
                 # Identify backend errors
                 if 'err' in report and len(report['err']) > 0:
-                    if 'rose_' in report['err']:
-                        result_kind = BACKEND_ERROR
-                    else:
-                        result_kind = TOOL_ERROR
+                    result_kind = BACKEND_ERROR if 'rose_' in report['err'] else TOOL_ERROR
                 else:
                     result_kind = TOOL_ERROR
 
@@ -512,7 +507,9 @@ class Renderer (object):
         for error_kind in ERROR_KINDS:
             self.write_begin(error_kind)
             name_id_map = self._error_groups[error_kind]
-            self.writeln('These {} units had error_kind "{}":'.format(name_id_map.count(), error_kind))
+            self.writeln(
+                f'These {name_id_map.count()} units had error_kind "{error_kind}":'
+            )
             for name in name_id_map.names_sorted():
                 self._write_error_unit(name, error_kind)
             self.write_end(error_kind)
@@ -525,13 +522,13 @@ class Renderer (object):
         report = self._json_in
         unit_id = self._error_groups[error_kind].to_id(name)
         run_report = report['trans-units'][unit_id]
-        self.write_begin('translation_unit_{} ({})'.format(unit_id, error_kind))
-        self.writeln('== File:           {}'.format(name))
-        self.writeln('== Return code:    {}'.format(run_report['returncode']))
+        self.write_begin(f'translation_unit_{unit_id} ({error_kind})')
+        self.writeln(f'== File:           {name}')
+        self.writeln(f"== Return code:    {run_report['returncode']}")
         if 'err' in run_report and len(run_report['err']) > 0:
             self.writeln('== Standard Error')
-            self.writeln('{}'.format(run_report['err'].encode('utf-8')))
-        self.write_end('translation_unit_{} ({})'.format(unit_id, error_kind))
+            self.writeln(f"{run_report['err'].encode('utf-8')}")
+        self.write_end(f'translation_unit_{unit_id} ({error_kind})')
 
     # def _write_not_backend_error_unit_stderr_only(self, name):
     #     report = self._json_in
@@ -543,12 +540,10 @@ class Renderer (object):
 
     @write_begin_end('Error Line Groups')
     def _write_stderr_texts(self):
-        line_group_index = 0
-        for line_group in self._all_stderr_texts:
-            self.write_begin('Error Line Group {}'.format(line_group_index))
+        for line_group_index, line_group in enumerate(self._all_stderr_texts):
+            self.write_begin(f'Error Line Group {line_group_index}')
             self.write(line_group)
-            self.write_end('Error Line Group {}'.format(line_group_index))
-            line_group_index += 1
+            self.write_end(f'Error Line Group {line_group_index}')
 
     @write_begin_end('Main Error Lines')
     def _write_main_error_lines(self):
@@ -558,23 +553,25 @@ class Renderer (object):
 
     @write_begin_end('Error Histogram')
     def _write_error_histogram(self):
-        self.write_boundary('{} unique errors, ordered by number of occurrences'.
-                         format(self._occurrences_per_error.count()))
+        self.write_boundary(
+            f'{self._occurrences_per_error.count()} unique errors, ordered by number of occurrences'
+        )
         for count, line in self._occurrences_per_error.counts_and_keys_by_count():
             self.writeln('({:3d} occurrences) {}'.format(count, line))
 
     @write_begin_end('First Error Histogram')
     def _write_first_error_histogram(self):
-        self.write_boundary('{} unique errors, ordered by number of files they appear first in'.
-                         format(self._first_occurrences_per_error.count()))
+        self.write_boundary(
+            f'{self._first_occurrences_per_error.count()} unique errors, ordered by number of files they appear first in'
+        )
         for count, line in self._first_occurrences_per_error.counts_and_keys_by_count():
             self.writeln('({:3d} files) {}'.format(count, line))
 
     def write_begin(self, message):
-        self.write_boundary('BEGIN {}'.format(message))
+        self.write_boundary(f'BEGIN {message}')
 
     def write_end(self, message):
-        self.write_boundary('END {}'.format(message))
+        self.write_boundary(f'END {message}')
         self.writeln('')
 
     def write_boundary(self, message):

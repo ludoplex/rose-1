@@ -12,7 +12,7 @@ class ROSECCRunner (ROSECXXRunner):
         """ Name the logger after this script and class, not the parent.
         """
         super( ROSECCRunner, self ).__init__()
-        self._logger = Logger( os.path.basename(__file__) + '.' + type(self).__name__ )
+        self._logger = Logger(f'{os.path.basename(__file__)}.{type(self).__name__}')
 
     def _process_args(self):
         """ Call the parent and then add a parameter.

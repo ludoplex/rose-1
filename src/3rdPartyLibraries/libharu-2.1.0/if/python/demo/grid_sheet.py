@@ -40,7 +40,7 @@ def error_handler (error_no, detail_no, user_data):
     sys.exit(1)
 
 
-def print_grid  (pdf, page):
+def print_grid(pdf, page):
     height = HPDF_Page_GetHeight (page)
     width = HPDF_Page_GetWidth (page)
     font = HPDF_GetFont (pdf, "Helvetica", NULL)
@@ -54,9 +54,8 @@ def print_grid  (pdf, page):
     while (y < height):
         if (y % 10 == 0):
             HPDF_Page_SetLineWidth (page, 0.5)
-        else:
-            if (HPDF_Page_GetLineWidth (page) != 0.25):
-                HPDF_Page_SetLineWidth (page, 0.25)
+        elif (HPDF_Page_GetLineWidth (page) != 0.25):
+            HPDF_Page_SetLineWidth (page, 0.25)
 
 
         HPDF_Page_MoveTo (page, 0, y)
@@ -82,9 +81,8 @@ def print_grid  (pdf, page):
     while (x < width):
         if (x % 10 == 0):
             HPDF_Page_SetLineWidth (page, 0.5)
-        else:
-            if (HPDF_Page_GetLineWidth (page) != 0.25):
-                HPDF_Page_SetLineWidth (page, 0.25)
+        elif (HPDF_Page_GetLineWidth (page) != 0.25):
+            HPDF_Page_SetLineWidth (page, 0.25)
 
 
         HPDF_Page_MoveTo (page, x, 0)

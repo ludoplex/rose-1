@@ -70,10 +70,7 @@ def draw_page(pdf, page, title_font, font, h_byte, l_byte):
             buf=[None,None]
 
             buf[0] = 16 - ypos - 1
-            if (buf[0] < 10):
-                buf[0] += ord('0')
-            else:
-                buf[0] += (ord('A') - 10)
+            buf[0] += ord('0') if (buf[0] < 10) else (ord('A') - 10)
             buf[1] = 0
             buf=[i % 256 for i in buf]      #because buf is unsigned char *
 
@@ -102,10 +99,7 @@ def draw_page(pdf, page, title_font, font, h_byte, l_byte):
             buf=[None,None]
 
             buf[0] = xpos - 1
-            if (buf[0] < 10):
-                buf[0] += ord('0')
-            else:
-                buf[0] += (ord('A') - 10)
+            buf[0] += ord('0') if (buf[0] < 10) else (ord('A') - 10)
             buf[1] = 0
             buf=[i % 256 for i in buf]      #because buf is unsigned char *
 
@@ -147,10 +141,10 @@ def draw_page(pdf, page, title_font, font, h_byte, l_byte):
         ypos-=1
 
 
-def main ():
+def main():
     global  pdf
 
-    flg=[HPDF_UINT16(0) for i in range(256)]
+    flg = [HPDF_UINT16(0) for _ in range(256)]
 
     fname=os.path.realpath(sys.argv[0])
     fname=fname[:fname.rfind('.')]+'.pdf'
@@ -208,18 +202,10 @@ def main ():
 
             if (btype == HPDF_BYTE_TYPE_LEAD and
                     unicode != 0x25A1):
-                if (min_l > j):
-                    min_l = j
-
-                if (max_l < j):
-                    max_l = j
-
-                if (min_h > i):
-                    min_h = i
-
-                if (max_h < i):
-                    max_h = i
-
+                min_l = min(min_l, j)
+                max_l = max(max_l, j)
+                min_h = min(min_h, i)
+                max_h = max(max_h, i)
                 flg[i] = 1
 
     printf ("min_h=%04X max_h=%04X min_l=%04X max_l=%04X\n",
