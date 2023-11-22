@@ -41,7 +41,7 @@ def error_handler (error_no, detail_no, user_data):
     sys.exit(1)
 
 
-def main ():
+def main():
     global pdf
 
     SAMP_TXT = "The quick brown fox jumps over the lazy dog."
@@ -64,11 +64,7 @@ def main ():
 
     title_font = HPDF_GetFont (pdf, "Helvetica", NULL)
 
-    if (len(sys.argv) > 2 and sys.argv[2]=="-E"):
-        embed = HPDF_TRUE
-    else:
-        embed = HPDF_FALSE
-
+    embed = HPDF_TRUE if (len(sys.argv) > 2 and sys.argv[2]=="-E") else HPDF_FALSE
     detail_font_name = HPDF_LoadTTFontFromFile (pdf, sys.argv[1], embed)
 
     detail_font = HPDF_GetFont (pdf, detail_font_name, NULL)

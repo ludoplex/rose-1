@@ -83,12 +83,11 @@ class Shape:
         raise NotImplementedError
 
     def select_pen(self, highlight):
-        if highlight:
-            if not hasattr(self, 'highlight_pen'):
-                self.highlight_pen = self.pen.highlighted()
-            return self.highlight_pen
-        else:
+        if not highlight:
             return self.pen
+        if not hasattr(self, 'highlight_pen'):
+            self.highlight_pen = self.pen.highlighted()
+        return self.highlight_pen
 
 
 class TextShape(Shape):
@@ -177,19 +176,6 @@ class TextShape(Shape):
         cr.set_source_rgba(*self.select_pen(highlight).color)
         cr.show_layout(layout)
         cr.restore()
-
-        if 0: # DEBUG
-            # show where dot thinks the text should appear
-            cr.set_source_rgba(1, 0, 0, .9)
-            if self.j == self.LEFT:
-                x = self.x
-            elif self.j == self.CENTER:
-                x = self.x - 0.5*self.w
-            elif self.j == self.RIGHT:
-                x = self.x - self.w
-            cr.move_to(x, self.y)
-            cr.line_to(x+self.w, self.y)
-            cr.stroke()
 
 
 class ImageShape(Shape):
@@ -335,7 +321,7 @@ class Url(object):
         self.item = item
         self.url = url
         if highlight is None:
-            highlight = set([item])
+            highlight = {item}
         self.highlight = highlight
 
 
@@ -346,7 +332,7 @@ class Jump(object):
         self.x = x
         self.y = y
         if highlight is None:
-            highlight = set([item])
+            highlight = {item}
         self.highlight = highlight
 
 
@@ -385,14 +371,10 @@ class Node(Element):
         if self.url is None:
             return None
         #print (x, y), (self.x1, self.y1), "-", (self.x2, self.y2)
-        if self.is_inside(x, y):
-            return Url(self, self.url)
-        return None
+        return Url(self, self.url) if self.is_inside(x, y) else None
 
     def get_jump(self, x, y):
-        if self.is_inside(x, y):
-            return Jump(self, self.x, self.y)
-        return None
+        return Jump(self, self.x, self.y) if self.is_inside(x, y) else None
 
 
 def square_distance(x1, y1, x2, y2):
@@ -413,9 +395,9 @@ class Edge(Element):
 
     def get_jump(self, x, y):
         if square_distance(x, y, *self.points[0]) <= self.RADIUS*self.RADIUS:
-            return Jump(self, self.dst.x, self.dst.y, highlight=set([self, self.dst]))
+            return Jump(self, self.dst.x, self.dst.y, highlight={self, self.dst})
         if square_distance(x, y, *self.points[-1]) <= self.RADIUS*self.RADIUS:
-            return Jump(self, self.src.x, self.src.y, highlight=set([self, self.src]))
+            return Jump(self, self.src.x, self.src.y, highlight={self, self.src})
         return None
 
 
@@ -515,7 +497,7 @@ class XDotAttrParser:
     def read_polygon(self):
         n = self.read_number()
         p = []
-        for i in range(n):
+        for _ in range(n):
             x, y = self.read_point()
             p.append((x, y))
         return p
@@ -723,15 +705,14 @@ class Scanner:
         if self.ignorecase:
             flags |= re.IGNORECASE
         self.tokens_re = re.compile(
-            '|'.join(['(' + regexp + ')' for type, regexp, test_lit in self.tokens]),
-             flags
+            '|'.join([f'({regexp})' for type, regexp, test_lit in self.tokens]),
+            flags,
         )
 
     def next(self, buf, pos):
         if pos >= len(buf):
             return EOF, '', pos
-        mo = self.tokens_re.match(buf, pos)
-        if mo:
+        if mo := self.tokens_re.match(buf, pos):
             text = mo.group()
             type, regexp, test_lit = self.tokens[mo.lastindex - 1]
             pos = mo.end()
@@ -809,10 +790,7 @@ class Lexer:
                 continue
             elif type is None:
                 msg = 'unexpected char '
-                if text >= ' ' and text <= '~':
-                    msg += "'%s'" % text
-                else:
-                    msg += "0x%X" % ord(text)
+                msg += f"'{text}'" if text >= ' ' and text <= '~' else "0x%X" % ord(text)
                 raise ParseError(msg, self.filename, line, col)
             else:
                 break
@@ -1640,8 +1618,8 @@ class DotWidget(gtk.DrawingArea):
         return False
 
     def get_drag_action(self, event):
-        state = event.state
         if event.button in (1, 2): # left or middle button
+            state = event.state
             if state & gtk.gdk.CONTROL_MASK:
                 return ZoomAction
             elif state & gtk.gdk.SHIFT_MASK:
@@ -1687,9 +1665,7 @@ class DotWidget(gtk.DrawingArea):
                     self.animate_to(jump.x, jump.y)
 
             return True
-        if event.button == 1 or event.button == 2:
-            return True
-        return False
+        return event.button in [1, 2]
 
     def on_area_scroll_event(self, area, event):
         if event.direction == gtk.gdk.SCROLL_UP:
@@ -1817,12 +1793,12 @@ class DotWindow(gtk.Window):
 
     def set_dotcode(self, dotcode, filename='<stdin>'):
         if self.widget.set_dotcode(dotcode, filename):
-            self.set_title(os.path.basename(filename) + ' - Dot Viewer')
+            self.set_title(f'{os.path.basename(filename)} - Dot Viewer')
             self.widget.zoom_to_fit()
 
     def set_xdotcode(self, xdotcode, filename='<stdin>'):
         if self.widget.set_xdotcode(xdotcode):
-            self.set_title(os.path.basename(filename) + ' - Dot Viewer')
+            self.set_title(f'{os.path.basename(filename)} - Dot Viewer')
             self.widget.zoom_to_fit()
 
     def open_file(self, filename):

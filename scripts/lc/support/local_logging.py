@@ -45,12 +45,12 @@ class Logger(object):
         if show_date or show_time:
             format_string = su.cws(format_string, '%(asctime)s')
             date_format_string = ''
-            if show_date:
-                date_format_string = su.cws(date_format_string, '%Y-%m-%d')
-            if show_time:
-                date_format_string = su.cws(date_format_string, '%H:%M:%S')
         else:
             date_format_string = None
+        if show_date:
+            date_format_string = su.cws(date_format_string, '%Y-%m-%d')
+        if show_time:
+            date_format_string = su.cws(date_format_string, '%H:%M:%S')
         format_string = su.cws(format_string, '%(levelname)s')
         if show_name and name:
             format_string = su.cws(format_string, '(%(name)s)')

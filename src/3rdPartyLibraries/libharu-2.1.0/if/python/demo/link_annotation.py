@@ -63,7 +63,7 @@ def main():
     fname=os.path.realpath(sys.argv[0])
     fname=fname[:fname.rfind('.')]+'.pdf'
 
-    page=[None for i in range(9)]
+    page = [None for _ in range(9)]
     rect=HPDF_Rect()
 
     uri = "http://sourceforge.net/projects/libharu"

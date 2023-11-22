@@ -155,12 +155,7 @@ class InterestingPaths:
 
         # If we made it here, it isn't specified anywhere so it isn't
         # interesting.
-        if len(self.includes) > 0:
-            return False
-        elif len(self.excludes) > 0:
-            return True
-        else: #no excludes or includes!
-            return True
+        return len(self.includes) <= 0
                 
 #         for r in self.res:
 #             if r.match(path):
@@ -416,7 +411,7 @@ def main():
     if excludes is None: excludes = []
 
 #    print >> sys.stderr, repos, includes, excludes
-    
+
     paths = InterestingPaths(includes, excludes)
 
     # Pass the dump-file header through unchanged.
@@ -436,7 +431,7 @@ def main():
         # Read revision contents.
         while 1:
             lump = read_lump(fr)
-            if lump == None or lump.hdrdict.has_key("Revision-number"):
+            if lump is None or lump.hdrdict.has_key("Revision-number"):
                 newrevhdr = lump
                 break
             contents.append(lump)

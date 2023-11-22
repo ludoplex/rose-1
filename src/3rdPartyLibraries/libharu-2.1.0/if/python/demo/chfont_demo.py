@@ -40,7 +40,7 @@ def error_handler (error_no, detail_no, user_data):
     HPDF_Free (pdf)
     sys.exit(1)
 
-def main ():
+def main():
     global  pdf
 
     if (len(sys.argv) < 4):
@@ -49,75 +49,72 @@ def main ():
         return 1
 
 
-    fname="mbtext/%s"% "cp932.txt"
-    cp932 = open (fname, "rb")
-    if (not cp932):
-        printf ("error: cannot open cp932.txt\n")
-        return 1
+    fname = 'mbtext/cp932.txt'
+    with open (fname, "rb") as cp932:
+        if (not cp932):
+            printf ("error: cannot open cp932.txt\n")
+            return 1
 
-    fname= "mbtext/%s" % "cp936.txt"
-    cp936 = open (fname, "rb")
-    if (not cp936):
-        printf ("error: cannot open cp936.txt\n")
-        return 1
+        fname = 'mbtext/cp936.txt'
+        with open (fname, "rb") as cp936:
+            if (not cp936):
+                printf ("error: cannot open cp936.txt\n")
+                return 1
 
-    fname=os.path.realpath(sys.argv[0])
-    fname=fname[:fname.rfind('.')]+'.pdf'
+            fname=os.path.realpath(sys.argv[0])
+            fname=fname[:fname.rfind('.')]+'.pdf'
 
-    pdf = HPDF_New (error_handler, NULL)
-    if (not pdf):
-        printf ("error: cannot create PdfDoc object\n")
-        return 1
+            pdf = HPDF_New (error_handler, NULL)
+            if (not pdf):
+                printf ("error: cannot create PdfDoc object\n")
+                return 1
 
 
-    HPDF_SetCompressionMode (pdf, HPDF_COMP_ALL)
-    HPDF_UseJPEncodings (pdf)
-    HPDF_UseCNSEncodings (pdf)
+            HPDF_SetCompressionMode (pdf, HPDF_COMP_ALL)
+            HPDF_UseJPEncodings (pdf)
+            HPDF_UseCNSEncodings (pdf)
 
-    fcp936_name = HPDF_LoadTTFontFromFile2 (pdf, sys.argv[1], int(sys.argv[2]),
-            HPDF_TRUE)
-    fcp932_name = HPDF_LoadTTFontFromFile2 (pdf, sys.argv[3], int(sys.argv[4]),
-            HPDF_TRUE)
+            fcp936_name = HPDF_LoadTTFontFromFile2 (pdf, sys.argv[1], int(sys.argv[2]),
+                    HPDF_TRUE)
+            fcp932_name = HPDF_LoadTTFontFromFile2 (pdf, sys.argv[3], int(sys.argv[4]),
+                    HPDF_TRUE)
 
-    # add a new page object.
-    page = HPDF_AddPage (pdf)
+            # add a new page object.
+            page = HPDF_AddPage (pdf)
 
-    HPDF_Page_SetHeight (page, 300)
-    HPDF_Page_SetWidth (page, 550)
+            HPDF_Page_SetHeight (page, 300)
+            HPDF_Page_SetWidth (page, 550)
 
-    fcp936 = HPDF_GetFont (pdf, fcp936_name, "GBK-EUC-H")
-    fcp932 = HPDF_GetFont (pdf, fcp932_name, "90ms-RKSJ-H")
+            fcp936 = HPDF_GetFont (pdf, fcp936_name, "GBK-EUC-H")
+            fcp932 = HPDF_GetFont (pdf, fcp932_name, "90ms-RKSJ-H")
 
-    print_grid  (pdf, page)
+            print_grid  (pdf, page)
 
-    HPDF_Page_SetTextLeading (page, 20)
+            HPDF_Page_SetTextLeading (page, 20)
 
-    HPDF_Page_BeginText (page)
-    HPDF_Page_MoveTextPos (page, 50, 250)
-    HPDF_Page_SetTextLeading (page, 25)
+            HPDF_Page_BeginText (page)
+            HPDF_Page_MoveTextPos (page, 50, 250)
+            HPDF_Page_SetTextLeading (page, 25)
 
-    buf=cp936.read(1024)
-    while buf:
-        HPDF_Page_SetFontAndSize (page, fcp936, 18)
-        buf ='%s\0' % buf
-        HPDF_Page_ShowText (page, buf)
+            buf=cp936.read(1024)
+            while buf:
+                HPDF_Page_SetFontAndSize (page, fcp936, 18)
+                buf ='%s\0' % buf
+                HPDF_Page_ShowText (page, buf)
 
-        buf=cp936.read(1024)
-        if buf:
-            HPDF_Page_SetFontAndSize (page, fcp932, 18)
-            buf ='%s\0' % buf
-            HPDF_Page_ShowText (page, buf)
+                buf=cp936.read(1024)
+                if buf:
+                    HPDF_Page_SetFontAndSize (page, fcp932, 18)
+                    buf ='%s\0' % buf
+                    HPDF_Page_ShowText (page, buf)
 
-        HPDF_Page_MoveToNextLine (page)
+                HPDF_Page_MoveToNextLine (page)
 
-    # save the document to a file
-    HPDF_SaveToFile (pdf, fname)
+            # save the document to a file
+            HPDF_SaveToFile (pdf, fname)
 
-    # clean up
-    HPDF_Free (pdf)
-
-    cp936.close ()
-    cp932.close ()
+            # clean up
+            HPDF_Free (pdf)
 
     return 0
 

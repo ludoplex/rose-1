@@ -24,9 +24,7 @@ def getHash(rawData):
   """
   """
 
-  hash = dict([ (rawData[i],rawData[i+1]) for i in range(0,len(rawData)-1,2) ])
-
-  return hash
+  return dict([ (rawData[i],rawData[i+1]) for i in range(0,len(rawData)-1,2) ])
 
 ##############################################################################
 
@@ -63,27 +61,27 @@ def csv2gnuplot(inputs,output,xKey,yExclude,yInclude,xlabel,ylabel,
   """
   """
 
-  fout = open(output + ".dat",'a')
-  
+  fout = open(f"{output}.dat", 'a')
+
   for i in inputs:
     reader = csv.reader(open(i,'r'),doublequote=True,skipinitialspace=True)
     keys = generateGraph(reader,fout,xKey,yExclude,yInclude,"\t")
 
   # gnuplot formatting
   index = 0
-  fscriptout = open(output + ".plt",'a')
+  fscriptout = open(f"{output}.plt", 'a')
 
   while index < len(keys):
     if index > 0:
       fscriptout.write("re")
 
     fscriptout.write("plot \"" + output + ".dat" +"\" using 1:" + 
-	str(index + 2) + ' ') 
+    str(index + 2) + ' ') 
 
     if with != "":
       fscriptout.write("smooth csplines ")
-      fscriptout.write("title \"" + keys[index] + "\"" + ' ') 
-      fscriptout.write("with " + with + '\n')
+      fscriptout.write("title \"" + keys[index] + "\"" + ' ')
+      fscriptout.write(f"with {with}" + '\n')
     else:
       fscriptout.write("title \"" + keys[index] + "\"" + '\n')
 
@@ -91,15 +89,15 @@ def csv2gnuplot(inputs,output,xKey,yExclude,yInclude,xlabel,ylabel,
   # while
 
   if Format != "":
-    fscriptout.write("set terminal " + Format + '\n')
+    fscriptout.write(f"set terminal {Format}" + '\n')
     fscriptout.write("set output \"" + output + '.' + Format + "\"\n")
 
   if xMin != "" or xMax != "":
-    fscriptout.write("set xrange [" + xMin + ':' + xMax + "]\n")
+    fscriptout.write(f"set xrange [{xMin}:{xMax}" + "]\n")
 
   if yMin != "" or yMax != "":
-    fscriptout.write("set yrange [" + yMin + ':' + yMax + "]\n") 
-  
+    fscriptout.write(f"set yrange [{yMin}:{yMax}" + "]\n") 
+
   if xlabel != "":
     fscriptout.write("set xlabel \"" + xlabel + "\"\n")
   else:
@@ -108,10 +106,10 @@ def csv2gnuplot(inputs,output,xKey,yExclude,yInclude,xlabel,ylabel,
   if ylabel != "":
     fscriptout.write("set ylabel \"" + ylabel + "\"\n")
   # if
- 
-  fscriptout.write("set key below\nset key box\n") 
-  fscriptout.write("set size " + width + ',' + height + '\n')
-  fscriptout.write("set pointsize " + pointsize + '\n')
+
+  fscriptout.write("set key below\nset key box\n")
+  fscriptout.write(f"set size {width},{height}" + '\n')
+  fscriptout.write(f"set pointsize {pointsize}" + '\n')
   fscriptout.write("replot\n")
 
   # end gnuplot formatting
@@ -124,7 +122,7 @@ def csv2gnuplot(inputs,output,xKey,yExclude,yInclude,xlabel,ylabel,
 def csv2excel(inputs,output,xKey,yExclude):
   """
   """
-  fout = open(output + ".csv",'a')
+  fout = open(f"{output}.csv", 'a')
 
   for i in inputs:
     reader = csv.reader(open(i,'r'),doublequote=True,skipinitialspace=True)
@@ -138,42 +136,41 @@ def csv2matlab(inputs,output,xKey,yExclude,xlabel,ylabel,height,width,Format):
   """
   """
 
-  fout = open(output + ".dat",'a')
-  
+  fout = open(f"{output}.dat", 'a')
+
   # Matlab data
   for i in inputs:
     reader = csv.reader(open(i,'r'),doublequote=True,skipinitialspace=True)
     keys = generateGraph(reader,fout,xKey,yExclude,"  ")
 
   # Matlab script
-  fscriptout = open(output + ".m",'a')
+  fscriptout = open(f"{output}.m", 'a')
   index = 2
   ceilSqrt = int(math.ceil(math.sqrt(len(keys))))
 
   if xlabel == "":
     xlabel = xKey
 
-  fscriptout.write("load " + output + ".dat" + '\n')
-  fscriptout.write("set(gcf,'position',[0 0 " + str(width) + ' ' + 
-			str(height) + "])\n")
-  fscriptout.write("x = " + output + "(:,1)\n")
+  fscriptout.write(f"load {output}.dat" + '\n')
+  fscriptout.write(
+      (f"set(gcf,'position',[0 0 {str(width)} {str(height)}" + "])\n"))
+  fscriptout.write(f"x = {output}" + "(:,1)\n")
 
   while index < len(keys) + 2:
-    fscriptout.write("y" + str(index) + " = " + output + "(:," 
-			+ str(index) + ")\n")
-    fscriptout.write("xlabel('" + xlabel + "')\n")
-    fscriptout.write("ylabel('" + ylabel + "')\n")
+    fscriptout.write((f"y{index} = {output}(:,{index}" + ")\n"))
+    fscriptout.write(f"xlabel('{xlabel}" + "')\n")
+    fscriptout.write(f"ylabel('{ylabel}" + "')\n")
     #fscriptout.write("ylabel('" + keys[index - 2] + "')\n")
-    fscriptout.write("subplot(" + str(ceilSqrt) + ',' + str(ceilSqrt) + 
-			',' + str(index - 1) + ") ; ")
-    fscriptout.write("plot(x,y" + str(index) + ",'o')\n")
-    fscriptout.write("legend('" + keys[index - 2] + "')\n")
+    fscriptout.write(f"subplot({ceilSqrt},{ceilSqrt},{str(index - 1)}) ; ")
+    fscriptout.write(f"plot(x,y{index}" + ",'o')\n")
+    fscriptout.write(f"legend('{keys[index - 2]}" + "')\n")
     index += 1
 
   if Format != "":
     fscriptout.write("set(gcf,'PaperPositionMode','auto')\n")
-    fscriptout.write("print(gcf,'-d" + Format + "'," + '\'' + 
-			output + '.' + Format + "')\n")
+    fscriptout.write(
+        ((((f"print(gcf,'-d{Format}'," + '\'' + output) + '.') + Format) +
+         "')\n"))
     fscriptout.write("quit\n")
   # Matlab script
 

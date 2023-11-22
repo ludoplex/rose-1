@@ -11,16 +11,13 @@ import subprocess
 import multiprocessing
 
 def enforce_abspath(path, bdir):
-	if os.path.isabs(path):
-		return path
-	else:
-		return os.path.realpath(bdir + '/' + path)
+	return path if os.path.isabs(path) else os.path.realpath(f'{bdir}/{path}')
 
 def normalize_translation_unit(trans_unit):
 	assert os.path.isabs(trans_unit['directory']), 'Found a "command object" where the workdir ("directory" field) is a relative path.'
 
 	# if argument field is not provided build it from commend field
-	if not 'arguments' in trans_unit:
+	if 'arguments' not in trans_unit:
 		assert 'command' in trans_unit, 'Found a compile command with neither "command" nor "arguments" filed.'
 		trans_unit.update({ 'arguments' : map(lambda s: s.strip() , filter(lambda s: len(s) > 0, trans_unit['command'].split(' '))) })
 
@@ -39,7 +36,16 @@ def normalize_translation_unit(trans_unit):
 		trans_unit['arguments'][i] = trans_unit['file']
 
 	# make all include path absolute)
-	trans_unit.update({ 'arguments' : map(lambda arg: '-I{}'.format(enforce_abspath(arg[2:], trans_unit['directory'])) if arg.startswith('-I') else arg, trans_unit['arguments']) })
+	trans_unit.update(
+		{
+			'arguments': map(
+				lambda arg: f"-I{enforce_abspath(arg[2:], trans_unit['directory'])}"
+				if arg.startswith('-I')
+				else arg,
+				trans_unit['arguments'],
+			)
+		}
+	)
 	trans_unit.update({ 'incpath' : map(lambda arg: arg[2:], filter(lambda s: s.startswith('-I'), trans_unit['arguments'])) })
 
 	# figure the output file (AND make it absolute)
@@ -60,8 +66,8 @@ def remove_duplicate_translation_units(comp_db):
 		if key in tu_map:
 			tu_map[key].append(tu)
 		else:
-			tu_map.update({ key : [ tu ] })
-	res_comp_db = list()
+			tu_map[key] = [ tu ]
+	res_comp_db = []
 	for ( ( fin , fout , wdir ) , tus ) in tu_map.iteritems():
 		assert len(tus) > 0
 		if len(tus) == 1:
@@ -78,7 +84,7 @@ def normalize_compilation_database(comp_db):
         return remove_duplicate_translation_units(map(normalize_translation_unit, comp_db))
 
 def transform_original_args(args, filter_args, replace_args):
-	args = filter(lambda arg: not arg in filter_args, args)
+	args = filter(lambda arg: arg not in filter_args, args)
 	args = map(lambda arg: replace_args[arg] if arg in replace_args else arg, args)
 	return args
 
@@ -134,7 +140,7 @@ def map_tool(job):
 	sys.stdout.flush()
 
 	if job['config']['nprocs'] == 0:
-		results = list()
+		results = []
 		for kwargs in workload:
 			results.append(apply_tool(**kwargs))
 			elapsed_time = time.time() - start_time

@@ -43,7 +43,7 @@ def error_handler (error_no, detail_no, user_data):
 def main():
     global pdf
 
-    detail_font=[None  for i in range(16)]
+    detail_font = [None for _ in range(16)]
     PAGE_HEIGHT = 210
 
     try:
@@ -149,7 +149,7 @@ def main():
         HPDF_Page_SetLineWidth (page, 0.5)
 
         x_pos = 20
-        for j in range(len (samp_text) // 2):
+        for _ in range(len (samp_text) // 2):
             HPDF_Page_MoveTo (page, x_pos, p.y - 10)
             HPDF_Page_LineTo (page, x_pos, p.y - 12)
             HPDF_Page_Stroke (page)
