@@ -37,7 +37,7 @@ for i in $TEST_FILES; do
     reffile="$TESTS_PREFIX_SRC/$prototype_name";
     $top_builddir/src/PolyRose $options $i -rose:o $outfile.test.c 2>/tmp/poccout >/dev/null
     z=`diff --ignore-matching-lines='CLooG' --ignore-matching-lines='rose\[WARN' --ignore-matching-lines='int c' --ignore-blank-lines --ignore-space-change --ignore-all-space $outfile.test.c $reffile.c 2>&1`
-    err=`cat /tmp/poccout | grep -v "\[CLooG\] INFO:"`;
+    err=`grep -v "\[CLooG\] INFO:" /tmp/poccout`;
     if ! [ -z "$z" ]; then
 	echo "DEBUG: diff output:[BEGIN] $z [END]";
 	echo "\033[31m[FAIL] PoCC -> generated codes are different\033[0m";

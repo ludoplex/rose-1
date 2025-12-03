@@ -1,5 +1,5 @@
 #!/bin/bash
-# Analyze a log file from e.g. 
+# Analyze a log file from e.g.
 #   run_and_log do_make.sh
 # Takes one parameter - the name of the log file
 # Expects PASSED and FAILED lines
@@ -80,13 +80,13 @@ log "Runner Passed          : ${runner_passed_count} - ${runner_passed_percent}%
 log "Runner Failed          : ${runner_failed_count} - ${runner_failed_percent}%"
 log "Runner unaccounted-for : ${runner_unaccounted_count} - ${runner_unaccounted_percent}%"
 log "- Errors:"
-log "Total error messages   : `cat ${error_lines_file} | wc -l`"
-log "Non-backend messages   : `cat ${error_messages_not_backend} | wc -l`"
-log "Backend messages       : `cat ${error_messages_backend} | wc -l`"
+log "Total error messages   : `wc -l < ${error_lines_file}`"
+log "Non-backend messages   : `wc -l < ${error_messages_not_backend}`"
+log "Backend messages       : `wc -l < ${error_messages_backend}`"
 log "- Errors, unique:"
-log "Non-backend messages   : `cat ${error_messages_not_backend_unique} | wc -l`"
-log "Backend messages       : `cat ${error_messages_backend_unique} | wc -l`"
-log "Backend files          : `cat ${error_files_backend_unique_file} | wc -l`"
+log "Non-backend messages   : `wc -l < ${error_messages_not_backend_unique}`"
+log "Backend messages       : `wc -l < ${error_messages_backend_unique}`"
+log "Backend files          : `wc -l < ${error_files_backend_unique_file}`"
 
 # Old support for do_one.sh with "(status 0)" etc. messages:
 #log "To find status not 0 messages, do:"

@@ -5,7 +5,7 @@
 # File: compass_submission_setup.sh
 # Date: 7/19/2007
 # Updated: 1/24/2008
-# Purpose: Automatically build compass from checker submit directory 
+# Purpose: Automatically build compass from checker submit directory
 #
 ################################################################################
 
@@ -29,7 +29,7 @@ declare -a SUBDIR_COUNT=0
 
 ###
 #
-# The updateCheckerList() function updates the file 
+# The updateCheckerList() function updates the file
 # projects/compass/CHECKER_LIST that contains a list of all checkers 'seen' by
 # this script
 #
@@ -84,7 +84,7 @@ prerequisites.h: \$(COMPASS_PROJECT)/extensions/prerequisites
 	find \$(COMPASS_PROJECT)/extensions/prerequisites -name "*.h" | awk -F/ '{print "#include \"" \$\$NF "\""}' > \$@
 
 instantiate_prerequisites.h: \$(COMPASS_PROJECT)/extensions/prerequisites
-	cat \$(COMPASS_PROJECT)/extensions/prerequisites/*.h | grep "^extern" | sed -e 's@extern[\\t\\ ]*@Compass::@g' | awk '{print \$\$1 " Compass::" \$\$2}' > \$@
+	grep "^extern" \$(COMPASS_PROJECT)/extensions/prerequisites/*.h | sed -e 's@extern[\\t\\ ]*@Compass::@g' | awk '{print \$\$1 " Compass::" \$\$2}' > \$@
 
 
 libcompass.so: \$(COMPASS_PROJECT)/src/compassSupport/compass.h \$(COMPASS_PROJECT)/src/compassSupport/compass.C prerequisites.h instantiate_prerequisites.h

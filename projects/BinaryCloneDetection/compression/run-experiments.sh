@@ -61,7 +61,7 @@ while [ "$#" -gt 0 -a "${1:0:1}" = "-" ]; do
 	--help|-h)
 	    usage 0
 	    ;;
-  
+
         *)
 	    echo "$argv0: unknown command-line switch: $arg" >&2
 	    echo "$argv0: see --help for more info" >&2
@@ -103,7 +103,7 @@ if [ "$#" -gt 0 ]; then
         touch $EPSILON_FILE_NAME
         D_PATCH="$TARGET_DIR/d_patch"
 
-         
+
         SPECIMENS=$(find "$DIR" -type f)
 
         for SPECIMEN in $SPECIMENS; do
@@ -123,9 +123,9 @@ if [ "$#" -gt 0 ]; then
       done
 
   done
- 
+
   echo "Appending to database"
-  psql "$OVERALL_DB" -f "$INSERT_FILE" --quiet --single-transaction --set AUTOCOMMIT=off --set ON_ERROR_STOP=on 
+  psql "$OVERALL_DB" -f "$INSERT_FILE" --quiet --single-transaction --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
 
   psql $OVERALL_DB -c 'create table distinct_functions as select distinct base_name, program_name from function_information'
 
@@ -133,7 +133,7 @@ if [ "$#" -gt 0 ]; then
 
   NUM_FUNCTIONS="100"
   typeset -i i END
- 
+
   for PROGRAM_NAME in $PROGRAMS; do
      echo -e "\n\nStarting analysis of $PROGRAM_NAME\n"
      TARGET_DIR=`pwd`
@@ -141,7 +141,7 @@ if [ "$#" -gt 0 ]; then
      NAME_2="$TARGET_DIR/specimen_2"
      COMBINED_NAME="$TARGET_DIR/combined"
      EPSILON_FILE_NAME="$TARGET_DIR/epsilon_file"
- 
+
      touch $EPSILON_FILE_NAME
      D_PATCH="$TARGET_DIR/d_patch"
 
@@ -152,19 +152,19 @@ if [ "$#" -gt 0 ]; then
 
      psql $OVERALL_DB -t -A -F"," -c  "select fta1.id, fta1.specimen, fta1.gzipped_size, fta1.bsdiff_epsilon_size, fta2.id, fta2.specimen, fta2.gzipped_size, fta2.bsdiff_epsilon_size  from function_information as fta1 join function_information as fta2 on fta1.id <= fta2.id where fta1.program_name='$PROGRAM_NAME' AND fta2.program_name='$PROGRAM_NAME';" > $OUTPUT_FILE
 
-     LENGTH=`cat $OUTPUT_FILE | wc -l`
+     LENGTH=`wc -l < $OUTPUT_FILE`
 
      INSERT_FILE=`tempfile`
- 
+
      while IFS=, read col1 col2 col3 col4 col5 col6 col7 col8
      do
-       
+
 
        FUNC_NAME_1="$col1"
        SPECIMEN_1="$col2"
        GZIPPED_SIZE_1="$col3"
        BSDIFF_EPSILON_SIZE_1="$col4"
-      
+
        FUNC_NAME_2="$col5"
        SPECIMEN_2="$col6"
        GZIPPED_SIZE_2="$col7"
@@ -211,7 +211,7 @@ if [ "$#" -gt 0 ]; then
        fi
 
 
-     
+
        if [ $GZIPPED_SIZE_1 -eq 0 -a $GZIPPED_SIZE_2 -eq 0 ]; then
           NCD_DISTANCE="0.0"
        else
@@ -229,7 +229,7 @@ if [ "$#" -gt 0 ]; then
 
      echo "$PROGRAM_NAME: Appending $LENGTH records to database"
 
-     psql "$OVERALL_DB" -f $INSERT_FILE --quiet --single-transaction --set AUTOCOMMIT=off --set ON_ERROR_STOP=on 
+     psql "$OVERALL_DB" -f $INSERT_FILE --quiet --single-transaction --set AUTOCOMMIT=off --set ON_ERROR_STOP=on
      rm $INSERT_FILE
 
 

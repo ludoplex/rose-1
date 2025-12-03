@@ -18,14 +18,14 @@ echo "create .res file for haru$_VERSION1"
 # for mingw
 
 _COMPILER="MinGW"
-cat win32/libhpdf.rc.template | sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" > win32/mingw/libhpdf_mingw.rc
+sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" win32/libhpdf.rc.template > win32/mingw/libhpdf_mingw.rc
 
 windres -O coff win32/mingw/libhpdf_mingw.rc win32/mingw/libhpdf_mingw.res
 
 # for cygwin
 
 _COMPILER="cygwin"
-cat win32/libhpdf.rc.template | sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" > win32/mingw/libhpdf_cygwin.rc
+sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" win32/libhpdf.rc.template > win32/mingw/libhpdf_cygwin.rc
 
 windres -O coff win32/mingw/libhpdf_cygwin.rc win32/mingw/libhpdf_cygwin.res
 
@@ -33,14 +33,14 @@ windres -O coff win32/mingw/libhpdf_cygwin.rc win32/mingw/libhpdf_cygwin.res
 # for bcc32
 
 _COMPILER="bcc32"
-cat win32/libhpdf.rc.template | sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" > win32/bcc32/libhpdf.rc
+sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" win32/libhpdf.rc.template > win32/bcc32/libhpdf.rc
 
 windres win32/bcc32/libhpdf.rc win32/bcc32/libhpdf.res
 
 # for msvc
 
 _COMPILER="msvc"
-cat win32/libhpdf.rc.template | sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" > win32/msvc/libhpdf.rc
+sed "s/_VERSION1/$_VERSION1/g;s/_VERSION2/$_VERSION2/g;s/_COMPILER/$_COMPILER/g" win32/libhpdf.rc.template > win32/msvc/libhpdf.rc
 
 windres win32/msvc/libhpdf.rc win32/msvc/libhpdf.res
 

@@ -39,18 +39,18 @@ WARNING_COLOR_BEGIN="\e[1m\e[93m\e[40m"
 SUCCESS_COLOR_BEGIN="\e[1m\e[92m\e[40m"
 # color codes end
 COLOR_END="\e[0m"
-  
+
 SUCCESS_MSG_PREFIX="${SUCCESS_COLOR_BEGIN}Success${COLOR_END}: "
-WARNING_MSG_PREFIX="${WARNING_COLOR_BEGIN}Warning${COLOR_END}: "  
+WARNING_MSG_PREFIX="${WARNING_COLOR_BEGIN}Warning${COLOR_END}: "
 ERROR_MSG_PREFIX="${ERROR_COLOR_BEGIN}Error${COLOR_END}: "
 
 echoAndRunCommand(){
   echo "$3"
   echo ""
   # "timeout" does not kill the command sometimes. Both the command and timeout are
-  #  sleeping then and nothing happens.  
+  #  sleeping then and nothing happens.
   #timeout --foreground "$1s" $3
-  
+
   # Own timeout implementation:
   # Execute command in background and stop it immediately to get PID:
   $3 &
@@ -70,7 +70,7 @@ echoAndRunCommand(){
         kill -0 ${COMMAND_PID} || exit 0
         ((TIMEOUT -= 1))
       done
-    
+
       # The command timed out: end it:
       echo -e "$2Timed out: Killing process now..."
       # Try SIGTERM first:
@@ -103,8 +103,8 @@ cleanUp() {
 }
 
 isSubset() {
- FIRST="$(cat "$2" | sort -u)"
- SECOND="$(cat "$1" "$2" | sort -u)"
+ FIRST="$(sort -u "$2")"
+ SECOND="$(sort -u "$1" "$2")"
  if [ "${FIRST}" == "${SECOND}" ]; then
    return "0"
  else
@@ -138,13 +138,13 @@ echo "Performing tests..."
 mkdir "${TEST_BUILD_ROOT_DIR}" || exit 1
 for currTestDir in "${TEST_ROOT_DIR}"*; do
   # Nothing to do if not a directory:
-  if [ ! -d "${currTestDir}" ]; then 
+  if [ ! -d "${currTestDir}" ]; then
     continue;
   fi
-  
+
   # Name of the current test:
   TEST_NAME="$(basename ${currTestDir})"
-  
+
   # Prefix for messages:
   TEST_MSG_PREFIX="Test ${NEUTRAL_COLOR_BEGIN}${TEST_NAME}${COLOR_END}: "
   # Prefix for error messages:
@@ -157,16 +157,16 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
   echo -e "${TEST_MSG_PREFIX}Establish test directory in build tree ..."
   mkdir "${currTestBuildDir}" || exit 1
   cp -rf "${currTestDir}/." "${currTestBuildDir}" || exit 1
-  
+
   # Set the current test build directory as working directory
   #  (this way arguments to analyterix can be relative)
   cd "${currTestBuildDir}" || exit 1
-  
+
   # The build test directory is now the main test directory:
   currTestDir="${currTestBuildDir}"
-  
+
   # Check for the subject:
-  if [ ! -f ${currTestDir}/${INPUT_FILE} ]; then 
+  if [ ! -f ${currTestDir}/${INPUT_FILE} ]; then
    echo -e "${TEST_ERROR_MSG_PREFIX}Subject/Input \"${currTestDir}/${INPUT_FILE}\" not found."
    exit 1
   else
@@ -184,11 +184,11 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
     FAIL_PASS_STRING_INVERT="fail"
   fi
 
-  # Execute test in a subshell (This way "exit" can be used to stop/end the test and the 
+  # Execute test in a subshell (This way "exit" can be used to stop/end the test and the
   #  result can be handled at one place.)
-  ( 
+  (
     echo -e "${TEST_MSG_PREFIX}Starting and expecting to ${FAIL_PASS_STRING} ..."
-    
+
     # Individual arguments for analyterix:
     ARGUMENTS=""
     if [ -f ${currTestDir}/${ARGUMENTS_FILE} ]; then # if an arguments file exists
@@ -197,7 +197,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
       # Replace new lines:
       ARGUMENTS=$(echo ${ARGUMENTS} | tr -d '\r' | tr -d '\n')
     fi
-    
+
     # Individual timeout for analyterix:
     TIMEOUT="0"
     TIMEOUT_MSG=""
@@ -206,7 +206,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
       TIMEOUT=$(<${currTestDir}/${TIMEOUT_FILE})
       TIMEOUT_MSG=" with a timeout of ${TIMEOUT} second(s) and"
     fi
-    
+
     # Run analyterix with the given arguments and echo the command before:
     echo -e "${TEST_MSG_PREFIX}Executing analyterix${TIMEOUT_MSG} by using the following command:"
     echoAndRunCommand "${TIMEOUT}" "${TEST_MSG_PREFIX}" "$BUILDDIR/analyterix ${INPUT_FILE} --edg:no_warnings -rose:output ${ANNOTATED_OUTPUT_FILE} ${ARGUMENTS}"
@@ -223,7 +223,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
     else
       echo -e "${TEST_MSG_PREFIX}Analyterix exited normally."
     fi
-    
+
     # Compare each reference file with the corresponding output file:
     for currRefFile in "${currTestDir}/"*."${REF_FILE_EXT}"; do
       # Check whether there are reference files (even if there are no files the
@@ -234,7 +234,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
       fi
       # Reference file name without extension (and without path):
       REF_FILE_BASE=$(basename "${currRefFile}" ${REF_FILE_EXT})
-      
+
       # How should the ref file be compared with the output file? Default is equal:
       COMPARE_MODE="equal"
       # Look for comparision mode file:
@@ -243,7 +243,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
         # Read comparision mode file content into COMPARE_MODE:
         COMPARE_MODE=$(<${CURR_COMPARE_MODE_FILE})
       fi
-      
+
       echo -e "${TEST_MSG_PREFIX}Searching for output file that corresponds to reference file \"${REF_FILE_BASE}${REF_FILE_EXT}\"..."
       OUTPUT_FILE_FOUND="0"
       # For each possible extension: check whether there is a corresponding output file.
@@ -252,7 +252,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
       for currOutputExt in ${OUTPUT_FILE_EXTS}; do
         # Absolute path to a possible output file:
         CURR_OUTPUT_FILE="${currTestDir}/${REF_FILE_BASE}${currOutputExt}"
-        # First part of message that is used in the if-case as well as in the else-case: 
+        # First part of message that is used in the if-case as well as in the else-case:
         OUTPUT_FILE_MSG="${TEST_MSG_PREFIX}Output file \"$(basename "${CURR_OUTPUT_FILE}")\""
         # Does the possible output file exist?
         if [ -f ${CURR_OUTPUT_FILE} ]; then
@@ -262,7 +262,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
           # Currently the equality test is needed in all cases:
           diff ${currRefFile} ${CURR_OUTPUT_FILE}
           EQUAL_RESULT="$?"
-          
+
           if [ "${COMPARE_MODE}" == "equal" ]; then
             # The result is the result of the equality check:
             COMPARE_RESULT=${EQUAL_RESULT}
@@ -283,14 +283,14 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
               COMPARE_RESULT="$?"
             fi
             COMPARE_MSG_PART="a superset of or equal to"
-          else 
+          else
             echo -e "${TEST_ERROR_MSG_PREFIX}Unknown comparision mode: ${COMPARE_MODE}"
             exit 2
           fi
-          
+
           if [ ! "${COMPARE_RESULT}" -eq 0 ]; then
             echo -e "${TEST_MSG_PREFIX}Output is not ${COMPARE_MSG_PART} reference."
-            exit 1	
+            exit 1
           else
             echo -e "${TEST_MSG_PREFIX}Output is ${COMPARE_MSG_PART} reference."
             OUTPUT_FILE_FOUND="1"
@@ -300,14 +300,14 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
         else
           echo -e "${OUTPUT_FILE_MSG} not found."
         fi
-      done 
+      done
       # It is an error if analyterix did not produce an output file for a reference file:
       if [ "${OUTPUT_FILE_FOUND}" == "0" ]; then
         echo -e "${TEST_MSG_PREFIX}No corresponding output file found."
         exit 1
-      fi 
+      fi
     done
-    
+
     # Test passed:
     echo -e "${TEST_MSG_PREFIX}Passed."
     exit 0
@@ -318,7 +318,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
     # Error while executing the test.
     exit 1
   fi
-  
+
   echo -e "${TEST_MSG_PREFIX}Finished. Comparing result with expected result..."
   if [ "${HAS_TO_FAIL}" == "${FAILED}" ]; then
     # Build the result message:
@@ -339,7 +339,7 @@ for currTestDir in "${TEST_ROOT_DIR}"*; do
   else
     TEST_COUNT_PASS=$((TEST_COUNT_PASS+1))
   fi
-  
+
   echo -e "\n${NEUTRAL_COLOR_BEGIN} <=========================================================================> ${COLOR_END}\n"
 done
 

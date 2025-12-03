@@ -8,7 +8,7 @@
 # the usage of this script
 function usage()
 {
-   echo 
+   echo
    echo "usage: ${0##*/} [-i <file>] [-o <file>] [-g <file>] [-G <file>]"
    echo "       [-O <file>] [-d <delim>] [-t] [-x] [-a] [-l] [-T]"
    echo "       [-W <width> -H <height>]] [-F <x11|png|ps>]"
@@ -18,7 +18,7 @@ function usage()
    echo "Transforms a given CSV file into a gnuplot input file. It can also"
    echo "produce a gnuplot script for plotting the data, as well as batch"
    echo "processing of several files with automatic output generation."
-   echo 
+   echo
    echo " -h   this help"
    echo " -i   <file>"
    echo "      the CSV file to use as input"
@@ -57,7 +57,7 @@ function usage()
    echo "      temp. gnuplot file and runs this (in combination with '-b',"
    echo "      otherwise '-g' must be given). "
    echo "      Works only if format is ps or png ('-F')."
-   echo 
+   echo
 }
 
 # variables
@@ -134,7 +134,7 @@ do
          ;;
       *) echo
          echo "Unknown option: '-$OPTARG'"
-         echo 
+         echo
          usage
          exit 1
          ;;
@@ -175,11 +175,11 @@ then
       then
          OPTIONS="$OPTIONS -O $i.ps"
       fi
-      
+
       # run script
       $0 $OPTIONS
    done
-   
+
    exit 0
 fi
 
@@ -202,7 +202,7 @@ fi
 # everything provided?
 if [ "$INPUT" = "" ] || [ "$DELIMITER" = "" ]
 then
-   echo 
+   echo
    echo "ERROR: not all parameters provided or incorrect!"
    echo
    usage
@@ -233,14 +233,14 @@ cp $INPUT $OUTPUT
 # change modifier into " "
 if [ ! "$DELIMITER" = " " ]
 then
-   cat $OUTPUT | sed s/$DELIMITER/" "/g > $TMPFILE
+   sed s/$DELIMITER/" "/g $OUTPUT > $TMPFILE
    cp $TMPFILE $OUTPUT
 fi
 
 # transpose matrix?
 if [ "$TRANSPOSE" = "yes" ]
 then
-   cat $OUTPUT | exec awk '
+   awk '
    NR == 1 {
            n = NF
            for (i = 1; i <= NF; i++)
@@ -256,7 +256,7 @@ then
    END {
            for (i = 1; i <= n; i++)
                    print row[i]
-   }' > $TMPFILE
+   }' $OUTPUT > $TMPFILE
    cp $TMPFILE $OUTPUT
 fi
 
@@ -264,13 +264,13 @@ fi
 if [ "$AVERAGE" = "yes" ]
 then
    COLCOUNT=`head -n1 $OUTPUT | wc -w | sed s/" "*//g`
-   ROWCOUNT=`cat $OUTPUT | wc -l | sed s/" "*//g`
+   ROWCOUNT=`wc -l < $OUTPUT | sed s/" "*//g`
    rm -f $TMPFILE
-   
+
    for ((i = 1; i <= $COLCOUNT; i++))
    do
-      COL=`cat $OUTPUT | cut -f$i -d" "`
-      
+      COL=`cut -f$i -d" " $OUTPUT`
+
       # average
       TMP="("`echo $COL | sed s/" "/+/g`")/$ROWCOUNT"
       if [ $i -gt 1 ]
@@ -293,7 +293,7 @@ fi
 # add x-axis?
 if [ "$XAXIS" = "yes" ]
 then
-   cat $OUTPUT | grep -n "." | sed s/":"/" "/g > $TMPFILE
+   grep -n "." $OUTPUT | sed s/":"/" "/g > $TMPFILE
    cp $TMPFILE $OUTPUT
 fi
 
@@ -316,7 +316,7 @@ then
       TERM="set terminal postscript"
       OUT="set output \"$OUTPUT_PLOT\""
    fi
-   
+
    # build "with" statement
    TMP=""
    WITH=""
@@ -332,7 +332,7 @@ then
    then
       WITH=" with"$TMP
    fi
-   
+
    # init
    echo "# gnuplot script for '$OUTPUT'" > $GNUPLOT
    if [ ! "$GNUPLOT_OPTIONS" = "" ]

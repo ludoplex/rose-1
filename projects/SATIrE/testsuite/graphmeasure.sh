@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 # create srw, nnh comparison diagrams
 # (C) 2008 Viktor Pavlu
@@ -40,7 +40,7 @@ run_analysis() {
 }
 
 for file in $FILES; do
-	
+
 	echo "--- measuring file $file ---"
   outfile=`basename $file`
 
@@ -50,24 +50,24 @@ for file in $FILES; do
 	#  - number of may-aliases
 	#  - number of must-aliases
 	run_analysis "srw98" "--summarygraph --no-individualgraphs"
-	srw_graphs=`cat outfile.stats | awk '/n_graphs: / {print $2;exit}'`
-	srw_nodes=`cat outfile.stats | awk '/n_nodes: / {print $2;exit}'`
-	srw_may_aliases=`cat outfile.stats | awk '/n_may-aliases: / {print $2;exit}'`
-	srw_must_aliases=`cat outfile.stats | awk '/n_must-aliases: / {print $2;exit}'`
+	srw_graphs=`awk '/n_graphs: / {print $2;exit}' outfile.stats`
+	srw_nodes=`awk '/n_nodes: / {print $2;exit}' outfile.stats`
+	srw_may_aliases=`awk '/n_may-aliases: / {print $2;exit}' outfile.stats`
+	srw_must_aliases=`awk '/n_must-aliases: / {print $2;exit}' outfile.stats`
 
   # nnh
 	#  - join individualgraphs into one summarygraph, then count the nodes
 	run_analysis "nnh99" "--summarygraph --no-individualgraphs"
-  nnh_nodes=`cat outfile.stats | awk '/n_nodes: / {print $2;exit}'`
+  nnh_nodes=`awk '/n_nodes: / {print $2;exit}' outfile.stats`
 
   # nnh
 	#  - nunmber of graphs (at least one per statement)
 	#  - number of may-aliases
 	#  - number of must-aliases
 	run_analysis "nnh99" "--no-summarygraph --individualgraphs"
-	nnh_graphs=`cat outfile.stats | awk '/n_graphs: / {print $2;exit}'`
-	nnh_may_aliases=`cat outfile.stats | awk '/n_may-aliases: / {print $2;exit}'`
-	nnh_must_aliases=`cat outfile.stats | awk '/n_must-aliases: / {print $2;exit}'`
+	nnh_graphs=`awk '/n_graphs: / {print $2;exit}' outfile.stats`
+	nnh_may_aliases=`awk '/n_may-aliases: / {print $2;exit}' outfile.stats`
+	nnh_must_aliases=`awk '/n_must-aliases: / {print $2;exit}' outfile.stats`
 
 	printf "$outfile\t$srw_nodes\t$nnh_nodes\n" | sed 's/\_/\\\\\_/g' >> $DATFILE.nodes
 	printf "$outfile\t$srw_graphs\t$nnh_graphs\n" | sed 's/\_/\\\\\_/g' >> $DATFILE.graphs
@@ -89,17 +89,17 @@ then
     printf "Plotting comparison diagrams .. "
     gnuplot <<EOF
 # GNUplot script to generate the graph histogram
-# 
+#
 
 # Description
-set key autotitle columnheader 
+set key autotitle columnheader
 
 # Style
 set boxwidth 0.7 absolute
 set style fill solid 1.00 border -1
 set datafile missing ''
 set style data histogram # Histogram style
-set style histogram clustered 
+set style histogram clustered
 set grid y # use a grid
 
 set title "SRW98 vs. NNH99"  offset character 0, 0, 0 font "" norotate
@@ -137,7 +137,7 @@ echo done.
 else
     echo "**WARNING: GNUplot version >= 4.2 was NOT found."
     echo "           Statistics plot will not be generated."
-fi 
+fi
 
 rm -f $TMPFILE
 
