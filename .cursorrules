@@ -1,0 +1,161 @@
+# ROSE Compiler Infrastructure - Cursor Rules
+# Source-to-source program transformation and analysis tools
+
+## Project Context
+
+ROSE is an open source compiler infrastructure from LLNL for building:
+- Source-to-source program transformation tools
+- Static analysis tools
+- Code optimization tools
+- Binary analysis tools
+
+Primary languages: C, C++, Fortran, OpenMP, UPC
+
+## Code Style Requirements
+
+### C/C++ Standards
+- Use C17/C++11 standards
+- Follow CERT Secure Coding guidelines
+- Apply COMPASS static analysis rules
+
+### Security-Critical Rules (CERT C)
+
+When writing or reviewing C/C++ code, enforce these CERT rules:
+
+#### Memory Safety (MEM)
+- MEM30-C: Do not access freed memory
+- MEM31-C: Free dynamically allocated memory when no longer needed
+- MEM33-C: Allocate and copy structures containing flexible array members dynamically
+- MEM34-C: Only free memory allocated dynamically
+- MEM35-C: Allocate sufficient memory for an object
+
+#### Expression Safety (EXP)
+- EXP33-C: Do not read uninitialized memory
+- EXP34-C: Do not dereference null pointers
+- EXP36-C: Do not cast pointers into more strictly aligned pointer types
+- EXP37-C: Call functions with the correct number and type of arguments
+- EXP39-C: Do not access a variable through a pointer of an incompatible type
+
+#### Integer Safety (INT)
+- INT30-C: Ensure that unsigned integer operations do not wrap
+- INT31-C: Ensure that integer conversions do not result in lost or misinterpreted data
+- INT32-C: Ensure that operations on signed integers do not result in overflow
+- INT33-C: Ensure that division and remainder operations do not result in divide-by-zero errors
+- INT34-C: Do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand
+
+#### String Safety (STR)
+- STR30-C: Do not attempt to modify string literals
+- STR31-C: Guarantee that storage for strings has sufficient space for character data and the null terminator
+- STR32-C: Do not pass a non-null-terminated character sequence to a library function that expects a string
+- STR34-C: Cast characters to unsigned char before converting to larger integer sizes
+
+#### Array Safety (ARR)
+- ARR30-C: Do not form or use out-of-bounds pointers or array subscripts
+- ARR36-C: Do not subtract or compare two pointers that do not refer to the same array
+- ARR37-C: Do not add or subtract an integer to a pointer to a non-array object
+- ARR38-C: Guarantee that library functions do not form invalid pointers
+- ARR39-C: Do not add or subtract a scaled integer to a pointer
+
+### COMPASS Checker Rules
+
+Apply these static analysis patterns from ROSE COMPASS:
+
+#### Buffer Overflow Prevention
+- Avoid sprintf, scanf, sscanf, gets, strcpy, strcat, memcpy without bounds checking
+- Use snprintf, fgets, strncpy, strncat, memcpy_s instead
+- Check buffer sizes before operations
+
+#### Null Pointer Safety
+- Validate pointers before dereferencing (nullDeref)
+- Check malloc/calloc/realloc return values (mallocReturnValueUsedInIfStmt)
+- Use assertions for pointer validation
+
+#### Memory Management
+- Allocate and free in same module (allocateAndFreeMemoryInTheSameModule)
+- Set pointers to NULL after free (setPointersToNull)
+- Check for new/delete mismatches (newDelete)
+
+#### Code Quality
+- Avoid magic numbers (magicNumber)
+- Limit cyclomatic complexity (cyclomaticComplexity)
+- Avoid deep nesting (deepNesting)
+- One declaration per line (oneLinePerDeclaration)
+- Avoid goto statements (noGoto)
+- Provide function documentation (functionDocumentation)
+
+#### Type Safety
+- Use explicit char signedness (explicitCharSign)
+- Avoid void* (voidStar)
+- Avoid C-style casts (doNotUseCstyleCasts)
+- Use const for string literals (constStringLiterals)
+
+#### Floating Point
+- Do not use float for loop counters (floatForLoopCounter)
+- Avoid exact floating point comparisons (floatingPointExactComparison)
+
+#### Signal Handling
+- Use only async-signal-safe functions in handlers (asynchronousSignalHandler)
+- Avoid using same handler for multiple signals (avoidUsingTheSameHandlerForMultipleSignals)
+
+#### Forbidden Functions
+Avoid these unsafe functions:
+- vfork() - use fork() instead (noVfork)
+- rand() - use random() or arc4random() (noRand)
+- setbuf() - use setvbuf() (preferSetvbufToSetbuf)
+- rewind() - use fseek() (preferFseekToRewind)
+
+## Build System
+
+ROSE uses autotools and CMake:
+- ./build to generate configure
+- ../src/configure --enable-languages=c,c++ --with-boost=/path/to/boost
+- make -j$(nproc)
+- make check
+
+## Directory Structure
+
+- src/: ROSE source code
+- projects/: Analysis tools (compass, CertSecureCodeProject, CodeThorn, etc.)
+- tools/: Feature-complete tools
+- tutorial/: Example ROSE features
+- tests/: Test suites
+- docs/: Documentation
+
+## Documentation References
+
+- ROSE Wiki: https://github.com/rose-compiler/rose/wiki
+- ROSE API: http://doxygen.rosecompiler.org
+- CERT C Coding Standard: https://wiki.sei.cmu.edu/confluence/display/c
+- LLNL ROSE: http://www.rosecompiler.org/
+
+## When Modifying ROSE Code
+
+1. Follow existing code patterns in src/
+2. Add corresponding tests in tests/
+3. Update documentation in docs/
+4. Run `make check` before committing
+5. Use SPDX license headers (BSD license)
+
+## ROSE-Specific Patterns
+
+### AST Traversal
+```cpp
+class MyTraversal : public AstSimpleProcessing {
+public:
+    void visit(SgNode* node) override;
+};
+```
+
+### Node Type Checking
+```cpp
+if (SgFunctionDeclaration* funcDecl = isSgFunctionDeclaration(node)) {
+    // Process function declaration
+}
+```
+
+### Building AST Nodes
+```cpp
+SgExprStatement* stmt = SageBuilder::buildExprStatement(expr);
+SageInterface::appendStatement(stmt, scope);
+```
+
