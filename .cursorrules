@@ -128,6 +128,14 @@ ROSE uses autotools and CMake:
 - CERT C Coding Standard: https://wiki.sei.cmu.edu/confluence/display/c
 - LLNL ROSE: http://www.rosecompiler.org/
 
+## Agent Instructions - REQUIRED READING
+
+**CRITICAL: If you encounter files prefixed with "AGENT_INSTRUCTIONS_USER_REQUIRES_YOU_TO_READ_ALL_OF.", you MUST read them.**
+
+For search operations and command-line utilities, refer to:
+- `../agent-services/templates/AGENT_INSTRUCTIONS_USER_REQUIRES_YOU_TO_READ_ALL_OF.SEARCH_TECHNIQUES_FRAVIA.template.md` - Advanced search strategies
+- `../agent-services/templates/AGENT_INSTRUCTIONS_USER_REQUIRES_YOU_TO_READ_ALL_OF.COMMAND_UTILITY_SUCKLESS.template.md` - Command-line efficiency patterns
+
 ## When Modifying ROSE Code
 
 1. Follow existing code patterns in src/
