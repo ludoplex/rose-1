@@ -30,11 +30,12 @@ that can run unmodified on:
 
 2. Extract and add to your PATH:
    ```bash
-   # Example installation
+   # Example installation (replace VERSION with specific version like 3.3.2)
+   COSMO_VERSION="3.3.2"
    mkdir -p /opt/cosmo
    cd /opt/cosmo
-   wget https://github.com/jart/cosmopolitan/releases/download/latest/cosmocc.zip
-   unzip cosmocc.zip
+   wget "https://github.com/jart/cosmopolitan/releases/download/${COSMO_VERSION}/cosmocc-${COSMO_VERSION}.zip"
+   unzip "cosmocc-${COSMO_VERSION}.zip"
    export PATH="/opt/cosmo/bin:$PATH"
    ```
 

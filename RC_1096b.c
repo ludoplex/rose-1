@@ -7,7 +7,11 @@
 #include "cosmopolitan.h"
 #else
 #include <stdlib.h>
+// alloca() is typically declared in stdlib.h on most systems
+// For systems where it's in alloca.h, we include it conditionally
+#if defined(__GLIBC__) || defined(__linux__)
 #include <alloca.h>
+#endif
 #endif
 
 int main(void) {

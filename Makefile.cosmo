@@ -37,22 +37,25 @@ CFLAGS ?=
 # Combined flags
 ALL_CFLAGS = $(COSMO_CFLAGS) $(CFLAGS)
 
-# Source files
-SIMPLE_SOURCES = RC_1096b.c
+# Source files (can be extended for additional C files)
+SOURCES = RC_1096b.c
 
 # Output directory for cosmopolitan builds
 BUILD_DIR = build-cosmo
 
+# Derive executable names from source files
+EXECUTABLES = $(patsubst %.c,$(BUILD_DIR)/%.com,$(SOURCES))
+
 # Default target
 .PHONY: all
-all: $(BUILD_DIR)/RC_1096b.com
+all: $(EXECUTABLES)
 
 # Create build directory
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# Build the simple test program as an Actually Portable Executable
-$(BUILD_DIR)/RC_1096b.com: RC_1096b.c | $(BUILD_DIR)
+# Generic pattern rule for building C source files as APE executables
+$(BUILD_DIR)/%.com: %.c | $(BUILD_DIR)
 	$(CC) $(ALL_CFLAGS) -o $@ $<
 
 # Clean build artifacts
@@ -62,9 +65,12 @@ clean:
 
 # Run tests
 .PHONY: test
-test: $(BUILD_DIR)/RC_1096b.com
-	@echo "Running RC_1096b test..."
-	@$(BUILD_DIR)/RC_1096b.com && echo "Test passed!" || echo "Test failed!"
+test: $(EXECUTABLES)
+	@echo "Running tests..."
+	@for exe in $(EXECUTABLES); do \
+		echo "Testing $$exe..."; \
+		$$exe && echo "  PASS" || echo "  FAIL"; \
+	done
 
 # Help target
 .PHONY: help
