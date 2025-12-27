@@ -1,0 +1,102 @@
+# Makefile.cosmo - Build configuration for jart/cosmopolitan portability
+#
+# This Makefile enables building portable executables using Cosmopolitan Libc
+# (https://github.com/jart/cosmopolitan), which produces Actually Portable
+# Executables (APE) that run on Linux, macOS, Windows, FreeBSD, NetBSD, and
+# OpenBSD across x86_64 and ARM64 architectures.
+#
+# Prerequisites:
+#   - cosmocc toolchain installed (https://github.com/jart/cosmopolitan)
+#   - Set COSMO_PATH to your cosmopolitan installation directory
+#
+# Usage:
+#   make -f Makefile.cosmo           # Build all targets
+#   make -f Makefile.cosmo clean     # Clean build artifacts
+#   make -f Makefile.cosmo test      # Build and run test
+#
+# Environment variables:
+#   COSMO_PATH  - Path to cosmopolitan installation (default: /opt/cosmo)
+#   CC          - C compiler (default: cosmocc)
+#   CFLAGS      - Additional C compiler flags
+
+# Cosmopolitan toolchain configuration
+COSMO_PATH ?= /opt/cosmo
+CC ?= cosmocc
+AR ?= cosmoar
+
+# Compiler flags for cosmopolitan compatibility
+# -static ensures fully static linking
+# -fno-pie disables position-independent executable (required for APE format)
+COSMO_CFLAGS = -static -fno-pie
+COSMO_CFLAGS += -Wall -Wextra
+COSMO_CFLAGS += -O2
+
+# User-provided flags
+CFLAGS ?=
+
+# Combined flags
+ALL_CFLAGS = $(COSMO_CFLAGS) $(CFLAGS)
+
+# Source files (can be extended for additional C files)
+SOURCES = RC_1096b.c
+
+# Output directory for cosmopolitan builds
+BUILD_DIR = build-cosmo
+
+# Derive executable names from source files
+EXECUTABLES = $(patsubst %.c,$(BUILD_DIR)/%.com,$(SOURCES))
+
+# Default target
+.PHONY: all
+all: $(EXECUTABLES)
+
+# Create build directory
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+# Generic pattern rule for building C source files as APE executables
+$(BUILD_DIR)/%.com: %.c | $(BUILD_DIR)
+	$(CC) $(ALL_CFLAGS) -o $@ $<
+
+# Clean build artifacts
+.PHONY: clean
+clean:
+	rm -rf $(BUILD_DIR)
+
+# Run tests
+.PHONY: test
+test: $(EXECUTABLES)
+	@echo "Running tests..."
+	@for exe in $(EXECUTABLES); do \
+		echo "Testing $$exe..."; \
+		$$exe && echo "  PASS" || echo "  FAIL"; \
+	done
+
+# Help target
+.PHONY: help
+help:
+	@echo "Makefile.cosmo - Build with Cosmopolitan Libc for portable executables"
+	@echo ""
+	@echo "Targets:"
+	@echo "  all     - Build all portable executables (default)"
+	@echo "  clean   - Remove build artifacts"
+	@echo "  test    - Build and run tests"
+	@echo "  help    - Show this help message"
+	@echo ""
+	@echo "Environment variables:"
+	@echo "  COSMO_PATH - Path to cosmopolitan installation (default: /opt/cosmo)"
+	@echo "  CC         - C compiler (default: cosmocc)"
+	@echo "  CFLAGS     - Additional compiler flags"
+	@echo ""
+	@echo "Examples:"
+	@echo "  make -f Makefile.cosmo"
+	@echo "  make -f Makefile.cosmo CC=/path/to/cosmocc"
+	@echo "  make -f Makefile.cosmo CFLAGS='-g'"
+
+# Check if cosmopolitan toolchain is available
+.PHONY: check-toolchain
+check-toolchain:
+	@which $(CC) > /dev/null 2>&1 || \
+		(echo "Error: $(CC) not found. Please install cosmopolitan toolchain." && \
+		 echo "See: https://github.com/jart/cosmopolitan" && exit 1)
+	@echo "Cosmopolitan toolchain found: $$(which $(CC))"
