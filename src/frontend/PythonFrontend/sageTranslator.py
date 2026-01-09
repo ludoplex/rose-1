@@ -19,8 +19,8 @@ class stack():
     self._stack.append(obj)
 
   def pop(self, expected=None):
-    if expected != None and expected != self.peek():
-        raise Exception("Popped unexpected value from stack.")
+    if expected not in [None, self.peek()]:
+      raise Exception("Popped unexpected value from stack.")
     self._stack.pop()
 
   def peek(self):

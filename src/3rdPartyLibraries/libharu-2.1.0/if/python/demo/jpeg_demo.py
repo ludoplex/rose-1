@@ -40,11 +40,11 @@ def error_handler (error_no, detail_no, user_data):
     HPDF_Free (pdf)
     sys.exit(1)
 
-def draw_image (pdf, filename, x, y, text):
+def draw_image(pdf, filename, x, y, text):
 
     page = HPDF_GetCurrentPage (pdf)
 
-    filename1="images/%s" % filename
+    filename1 = f"images/{filename}"
 
     image = HPDF_LoadJpegImageFromFile (pdf, filename1)
 

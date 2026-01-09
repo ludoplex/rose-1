@@ -30,7 +30,7 @@ class ROSECXXRunner (object):
         self._current_dir = ""
         self._failed_file = None
         self._failed_file_path = ""
-        self._logger = Logger( os.path.basename(__file__) + '.' + type(self).__name__ )
+        self._logger = Logger(f'{os.path.basename(__file__)}.{type(self).__name__}')
         self._parser = None
         self._passed_file = None
         self._passed_file_path = ""
@@ -87,13 +87,13 @@ class ROSECXXRunner (object):
 
     def _log_success(self, args):
         self._logger.success("\n" + self._SEPARATOR + "\nPASSED")
-        self._logger.debug("Will log to " + self._passed_file_path + ":")
+        self._logger.debug(f"Will log to {self._passed_file_path}:")
         self._logger.debug(args)
         self._passed_file.write(str(args) + '\n')
 
     def _log_failure(self, args):
         self._logger.problem("\n" + self._SEPARATOR + "\nFAILED")
-        self._logger.debug("Will log to " + self._failed_file_path + ":")
+        self._logger.debug(f"Will log to {self._failed_file_path}:")
         self._logger.debug(args)
         self._failed_file.write(str(args) + '\n')
 

@@ -42,18 +42,14 @@ def error_handler (error_no, detail_no, user_data):
     HPDF_Free (pdf)
     sys.exit(1)
 
-def show_stripe_pattern  (page, x, y):
-    iy = 0
-
-    while (iy < 50):
+def show_stripe_pattern(page, x, y):
+    for iy in range(0, 50, 3):
         HPDF_Page_SetRGBStroke (page, 0.0, 0.0, 0.5)
         HPDF_Page_SetLineWidth (page, 1)
         HPDF_Page_MoveTo (page, x, y + iy)
         HPDF_Page_LineTo (page, x + HPDF_Page_TextWidth (page, "ABCabc123"),
                     y + iy)
         HPDF_Page_Stroke (page)
-        iy += 3
-
     HPDF_Page_SetLineWidth (page, 2.5)
 
 

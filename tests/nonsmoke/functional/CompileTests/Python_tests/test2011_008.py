@@ -1,2 +1,2 @@
 def foo(bar):
-  bar + "baz"
+  f"{bar}baz"

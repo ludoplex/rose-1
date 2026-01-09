@@ -39,10 +39,10 @@ def error_handler (error_no, detail_no, user_data):
     HPDF_Free (pdf)
     sys.exit(1)
 
-def draw_image (pdf, filename, x, y, text):
+def draw_image(pdf, filename, x, y, text):
     page = HPDF_GetCurrentPage (pdf)
 
-    filename1= "pngsuite/%s" % filename
+    filename1 = f"pngsuite/{filename}"
 
     image = HPDF_LoadPngImageFromFile (pdf, filename1)
 

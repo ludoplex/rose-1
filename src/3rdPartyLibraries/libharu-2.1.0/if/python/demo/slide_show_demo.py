@@ -109,7 +109,7 @@ def print_page  (page, caption, font, style, prev, next):
 def main():
     global  pdf
 
-    page=[None for i in range(17)]
+    page = [None for _ in range(17)]
 
     fname=os.path.realpath(sys.argv[0])
     fname=fname[:fname.rfind('.')]+'.pdf'
@@ -142,39 +142,39 @@ def main():
     page[16] = HPDF_AddPage (pdf)
 
     print_page(page[0], "HPDF_TS_WIPE_RIGHT", font,
-			HPDF_TS_WIPE_RIGHT, NULL, page[1])
+    HPDF_TS_WIPE_RIGHT, NULL, page[1])
     print_page(page[1], "HPDF_TS_WIPE_UP", font,
-			HPDF_TS_WIPE_UP, page[0], page[2])
+    HPDF_TS_WIPE_UP, page[0], page[2])
     print_page(page[2], "HPDF_TS_WIPE_LEFT", font,
-			HPDF_TS_WIPE_LEFT, page[1], page[3])
+    HPDF_TS_WIPE_LEFT, page[1], page[3])
     print_page(page[3], "HPDF_TS_WIPE_DOWN", font,
-			HPDF_TS_WIPE_DOWN, page[2], page[4])
+    HPDF_TS_WIPE_DOWN, page[2], page[4])
     print_page(page[4], "HPDF_TS_BARN_DOORS_HORIZONTAL_OUT", font,
-			HPDF_TS_BARN_DOORS_HORIZONTAL_OUT, page[3], page[5])
+    HPDF_TS_BARN_DOORS_HORIZONTAL_OUT, page[3], page[5])
     print_page(page[5], "HPDF_TS_BARN_DOORS_HORIZONTAL_IN", font,
-			HPDF_TS_BARN_DOORS_HORIZONTAL_IN, page[4], page[6])
+    HPDF_TS_BARN_DOORS_HORIZONTAL_IN, page[4], page[6])
     print_page(page[6], "HPDF_TS_BARN_DOORS_VERTICAL_OUT", font,
-			HPDF_TS_BARN_DOORS_VERTICAL_OUT, page[5], page[7])
+    HPDF_TS_BARN_DOORS_VERTICAL_OUT, page[5], page[7])
     print_page(page[7], "HPDF_TS_BARN_DOORS_VERTICAL_IN", font,
-			HPDF_TS_BARN_DOORS_VERTICAL_IN, page[6], page[8])
+    HPDF_TS_BARN_DOORS_VERTICAL_IN, page[6], page[8])
     print_page(page[8], "HPDF_TS_BOX_OUT", font,
-			HPDF_TS_BOX_OUT, page[7], page[9])
+    HPDF_TS_BOX_OUT, page[7], page[9])
     print_page(page[9], "HPDF_TS_BOX_IN", font,
-			HPDF_TS_BOX_IN, page[8], page[10])
+    HPDF_TS_BOX_IN, page[8], page[10])
     print_page(page[10], "HPDF_TS_BLINDS_HORIZONTAL", font,
-			HPDF_TS_BLINDS_HORIZONTAL, page[9], page[11])
+    HPDF_TS_BLINDS_HORIZONTAL, page[9], page[11])
     print_page(page[11], "HPDF_TS_BLINDS_VERTICAL", font,
-			HPDF_TS_BLINDS_VERTICAL, page[10], page[12])
+    HPDF_TS_BLINDS_VERTICAL, page[10], page[12])
     print_page(page[12], "HPDF_TS_DISSOLVE", font,
-			HPDF_TS_DISSOLVE, page[11], page[13])
+    HPDF_TS_DISSOLVE, page[11], page[13])
     print_page(page[13], "HPDF_TS_GLITTER_RIGHT", font,
-			HPDF_TS_GLITTER_RIGHT, page[12], page[14])
+    HPDF_TS_GLITTER_RIGHT, page[12], page[14])
     print_page(page[14], "HPDF_TS_GLITTER_DOWN", font,
-			HPDF_TS_GLITTER_DOWN, page[13], page[15])
+    HPDF_TS_GLITTER_DOWN, page[13], page[15])
     print_page(page[15], "HPDF_TS_GLITTER_TOP_LEFT_TO_BOTTOM_RIGHT", font,
-			HPDF_TS_GLITTER_TOP_LEFT_TO_BOTTOM_RIGHT, page[14], page[16])
+    HPDF_TS_GLITTER_TOP_LEFT_TO_BOTTOM_RIGHT, page[14], page[16])
     print_page(page[16], "HPDF_TS_REPLACE", font,
-			HPDF_TS_REPLACE, page[15], NULL)
+    HPDF_TS_REPLACE, page[15], NULL)
 
 
     HPDF_SetPageMode (pdf, HPDF_PAGE_MODE_FULL_SCREEN)

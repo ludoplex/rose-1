@@ -5,7 +5,7 @@ import os, os.path, sys
 
 CURRENTDIR = os.path.dirname(os.path.realpath(__file__))
 #ROOT = os.path.realpath(CURRENTDIR + "/../..")
-ROOT = os.path.realpath(CURRENTDIR + "/..")
+ROOT = os.path.realpath(f"{CURRENTDIR}/..")
 
 #REL = "../npb2.3-omp-c/"
 REL = "npb2.3-omp-c/"
@@ -19,18 +19,18 @@ def run(cmd):
 	p = subprocess.Popen(args)
 	p.wait()
 
-CPARSER = ROOT + "rosePrgKnowledgeBuilder/rosePrgKnowledgeBuilder" 
+CPARSER = f"{ROOT}rosePrgKnowledgeBuilder/rosePrgKnowledgeBuilder"
 #FLAG = " -c -w -emit-owl "
 FLAG = " -c -w -emit-ttl "
 def build_kb():
 	for mainc in TESTDIRS:
 		F = os.path.basename(mainc)
-		#INCL = " -I{L}/common" 
-		cmd = CPARSER + FLAG + "{}.ttl ".format(F) + mainc
+		#INCL = " -I{L}/common"
+		cmd = CPARSER + FLAG + f"{F}.ttl " + mainc
 #		cmd = CPARSER + FLAG + "{}.owl ".format(F) + mainc
 		run(cmd)
 
-RoseNativeCl = ROOT + "/projects/rose_canonicalloop/roseNativeCl.exe -c -w "
+RoseNativeCl = f"{ROOT}/projects/rose_canonicalloop/roseNativeCl.exe -c -w "
 def rose_cl():
 	for mainc in TESTDIRS:
 		F = os.path.basename(mainc)
@@ -41,9 +41,9 @@ def rose_cl():
 #--------
 def openk_run(runpl, of):
 	for mainc in TESTDIRS:
-		main_in = os.path.basename(mainc) + ".ttl"
-		main_out = main_in + "_openk_{}_report.txt".format(of)
-		cmd = runpl + " " + main_in + " " + main_out
+		main_in = f"{os.path.basename(mainc)}.ttl"
+		main_out = f"{main_in}_openk_{of}_report.txt"
+		cmd = f"{runpl} {main_in} {main_out}"
 		run(cmd)
 
 
@@ -58,7 +58,7 @@ def openk_cfg():
 	openk_run(runpl, 'cfg')
 
 
-roseCfg = ROOT + "/projects/staticCFG_tests/testStaticCFG.exe "
+roseCfg = f"{ROOT}/projects/staticCFG_tests/testStaticCFG.exe "
 def rose_cfg():
 	for mainc in TESTDIRS:
 		cmd = roseCfg + mainc

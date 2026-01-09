@@ -120,16 +120,16 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @GeneralAutoLog()
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print(
         "Exercising GeneralAutoLog with default logger.  Logger name defaults to module name")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -142,16 +142,16 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @GeneralAutoLog(logger=logger)
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog with passed-in, initialized logger")
         print("This logger has show_name=False")
         print("Should see:")
-        print('<date    > <time  > --- BEGIN %s' % func_name)
+        print(f'<date    > <time  > --- BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- END   %s' % func_name)
+        print(f'<date    > <time  > --- END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -164,15 +164,15 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @GeneralAutoLog(logger=logger, level=Logger.DEBUG)
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog debug level")
         print("Should see:")
-        print('<date    > <time  > $$$ (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > $$$ ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > $$$ (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > $$$ ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -186,15 +186,15 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @AutoLog()
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog with logger supplied by helper func")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -211,15 +211,15 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @AutoLog01()
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog with logger supplied by subclass")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -238,15 +238,15 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @AutoLog01()
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog with debug logger supplied by subclass")
         print("Should see:")
-        print('<date    > <time  > $$$ (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > $$$ ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > $$$ (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > $$$ ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -257,13 +257,13 @@ class TestCase02AutoLogger(unittest.TestCase):
 
         @GeneralAutoLog(func_name=func_name)
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         print("Exercising GeneralAutoLog explicit function name.")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name,func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')
@@ -272,18 +272,21 @@ class TestCase02AutoLogger(unittest.TestCase):
         logger_name = 'local_logging_tests'
         func_name = 'MyClass'
 
+
+
         class MyClass(object):
 
             @GeneralAutoLog(func_name=func_name)
             def __init__(self, parm):
-                print('Constructed with "%s"' % parm)
+                print(f'Constructed with "{parm}"')
+
 
         print("Exercising GeneralAutoLog with explicit function name that "
               "changes __init__ to the class name.")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Constructed with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         MyClass('foo')
         print('')
@@ -302,15 +305,15 @@ class TestCase03AutoLoggerMember(unittest.TestCase):
 
         @GeneralAutoLog()
         def test_decorator(parm):
-            print('Called with "%s"' % parm)
+            print(f'Called with "{parm}"')
 
         func_name = test_decorator.__name__
 
         print("Exercising GeneralAutoLog with default logger.  Logger name defaults to module name")
         print("Should see:")
-        print('<date    > <time  > --- (%s) BEGIN %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) BEGIN {func_name}')
         print('Called with "foo"')
-        print('<date    > <time  > --- (%s) END   %s' % (logger_name, func_name))
+        print(f'<date    > <time  > --- ({logger_name}) END   {func_name}')
         print('')
         test_decorator('foo')
         print('')

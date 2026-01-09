@@ -1,8 +1,7 @@
 # test 'yield'
 
 def foo():
-    for y in (1, 2, 3):
-        yield y
+    yield from (1, 2, 3)
 
 for x in foo():
     print x

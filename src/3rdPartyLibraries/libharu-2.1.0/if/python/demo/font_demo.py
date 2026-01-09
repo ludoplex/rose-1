@@ -61,7 +61,7 @@ font_list=[
     "ZapfDingbats",
 ]
 
-def main ():
+def main():
     global pdf
 
     page_title = "Font Demo"
@@ -104,9 +104,9 @@ def main ():
     HPDF_Page_BeginText (page)
     HPDF_Page_MoveTextPos (page, 60, height - 105)
 
-    for i in font_list:
-        samp_text = "abcdefgABCDEFG12345!#$%&+-@?"
+    samp_text = "abcdefgABCDEFG12345!#$%&+-@?"
 
+    for i in font_list:
         #font_name = HPDF_LoadTTFontFromFile (pdf, "c:/winnt/fonts/arial.ttf", HPDF_TRUE);
 
         #font_name='arial.ttf'

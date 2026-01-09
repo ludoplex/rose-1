@@ -8,14 +8,12 @@ from local_logging import Logger, LineLogger, FunctionLogger
 
 
 def _exec_info(command, globals, locals):
-    return "exec %s" % \
-           (str(command),)
+    return f"exec {str(command)}"
 # return "exec %s in\\\n%s,\\\n%s" % \
 #        (str(command), str(globals), str(locals))
 
 def _eval_info(source, globals, locals):
-    return "eval(%s)" % \
-           (str(source),)
+    return f"eval({str(source)})"
 # return "eval(source=%s,\nglobals=%s,\nlocals=%s)" % \
 #        (str(source), str(globals), str(locals))
 
@@ -32,10 +30,10 @@ def _check_call_info(args, dir):
 #        (str(args), str(os.environ), str(dir))
 
 def _exception_info(e):
-    return '%s args:%s' % (type(e), str(e))
+    return f'{type(e)} args:{str(e)}'
 
 def _exception_message(e, info):
-    return 'EXCEPTION "%s" raised while running "%s"' % (_exception_info(e), info)
+    return f'EXCEPTION "{_exception_info(e)}" raised while running "{info}"'
 
 class Runner():
     class Failed(Exception):
@@ -55,9 +53,9 @@ class Runner():
     def execOrLog(self, command, globals=None, locals=None, doReraise=False):
         info_message = "\n%s" % _exec_info(command, globals, locals)
         if self._effortOnly:
-            self._logger.info("Would do:%s" % info_message)
+            self._logger.info(f"Would do:{info_message}")
         else:
-            self._logger.info("Doing:%s" % info_message)
+            self._logger.info(f"Doing:{info_message}")
             self.tryExec(command, globals, locals, doReraise)
 
     def tryExec(self, command, globals=None, locals=None, doReraise=False):
@@ -77,9 +75,9 @@ class Runner():
     def evalOrLog(self, expression, globals=None, locals=None):
         info_message = "\n%s" % _eval_info(expression, globals, locals)
         if self._effortOnly:
-            self._logger.info("Would do:%s" % info_message)
+            self._logger.info(f"Would do:{info_message}")
         else:
-            self._logger.info("Doing:%s" % info_message)
+            self._logger.info(f"Doing:{info_message}")
             return self.tryEval(expression, globals, locals)
 
     def tryEval(self, expression, globals=None, locals=None):
@@ -102,11 +100,11 @@ class Runner():
     def popenOrLog(self, callArgs, dir=None):
         info_message = "\n%s" % _popen_info(callArgs, dir)
         if self._effortOnly:
-            self._logger.info("Would do:%s" % info_message)
+            self._logger.info(f"Would do:{info_message}")
             # Caller expects a tuple:
             return ("", "")
         else:
-            self._logger.info("Doing:%s" % info_message)
+            self._logger.info(f"Doing:{info_message}")
             return self.tryPopen(callArgs, dir)
 
     def tryPopen(self, callArgs, dir=None):
@@ -136,9 +134,9 @@ class Runner():
     def callOrLog(self, callArgs, dir=None):
         info_message = "\n%s" % _check_call_info(callArgs, dir)
         if self._effortOnly:
-            self._logger.info("Would do:%s" % info_message)
+            self._logger.info(f"Would do:{info_message}")
         else:
-            self._logger.info("Doing:%s" % info_message)
+            self._logger.info(f"Doing:{info_message}")
             self.tryCall(callArgs, dir)
 
     def tryCall(self, callArgs, dir=None):

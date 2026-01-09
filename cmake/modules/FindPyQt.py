@@ -6,7 +6,7 @@ import PyQt4.pyqtconfig
 
 pyqtcfg = PyQt4.pyqtconfig.Configuration()
 print("pyqt_version:%06.0x" % pyqtcfg.pyqt_version)
-print("pyqt_version_str:%s" % pyqtcfg.pyqt_version_str)
+print(f"pyqt_version_str:{pyqtcfg.pyqt_version_str}")
 
 pyqt_version_tag = ""
 in_t = False
@@ -18,7 +18,7 @@ for item in pyqtcfg.pyqt_sip_flags.split(' '):
             pyqt_version_tag = item
     else:
         in_t = False
-print("pyqt_version_tag:%s" % pyqt_version_tag)
+print(f"pyqt_version_tag:{pyqt_version_tag}")
 
-print("pyqt_sip_dir:%s" % pyqtcfg.pyqt_sip_dir)
-print("pyqt_sip_flags:%s" % pyqtcfg.pyqt_sip_flags)
+print(f"pyqt_sip_dir:{pyqtcfg.pyqt_sip_dir}")
+print(f"pyqt_sip_flags:{pyqtcfg.pyqt_sip_flags}")

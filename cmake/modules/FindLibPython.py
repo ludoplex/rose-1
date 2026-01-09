@@ -6,8 +6,8 @@
 import sys
 import distutils.sysconfig
 
-print("exec_prefix:%s" % sys.exec_prefix)
-print("short_version:%s" % sys.version[:3])
-print("long_version:%s" % sys.version.split()[0])
-print("py_inc_dir:%s" % distutils.sysconfig.get_python_inc())
+print(f"exec_prefix:{sys.exec_prefix}")
+print(f"short_version:{sys.version[:3]}")
+print(f"long_version:{sys.version.split()[0]}")
+print(f"py_inc_dir:{distutils.sysconfig.get_python_inc()}")
 print("site_packages_dir:%s" % distutils.sysconfig.get_python_lib(plat_specific=1))

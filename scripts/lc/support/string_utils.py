@@ -23,9 +23,9 @@ class StringUtils:
     def countSingularOrPlural(self, count, singularString, pluralString):
         "Returns singularString if Count is 1, otherwise returns pluralString"
         if count == 1:
-            return str(count) + " " + singularString
+            return f"{str(count)} {singularString}"
         else:
-            return str(count) + " " + pluralString
+            return f"{str(count)} {pluralString}"
 
     def concatWSpace(self, left, right):
         """ Concatenates two strings.  Puts a space between if neither is None or empty.
@@ -43,10 +43,7 @@ class StringUtils:
     def noneToEmpty(self, stringIn):
         """ Given None, returns "", otherwise returns what it's given.
         """
-        if stringIn is None:
-            return ''
-        else:
-            return stringIn
+        return '' if stringIn is None else stringIn
 
     cws = concatWSpace
     cwst = concatWString

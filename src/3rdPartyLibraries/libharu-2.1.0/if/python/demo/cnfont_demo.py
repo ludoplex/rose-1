@@ -56,7 +56,6 @@ SimHei,BoldItalic
     chinesefonts=chinesefonts.split('\n')
     chinesefonts=[i for i in chinesefonts if i]
 
-    detail_font=[]
     PAGE_HEIGHT = 210
 
     try:
@@ -85,9 +84,7 @@ SimHei,BoldItalic
     HPDF_UseCNSFonts (pdf)
 
 
-    for i in chinesefonts:
-        detail_font.append( HPDF_GetFont (pdf, i, "GB-EUC-H"))
-
+    detail_font = [HPDF_GetFont (pdf, i, "GB-EUC-H") for i in chinesefonts]
     # Set page mode to use outlines.
     HPDF_SetPageMode(pdf, HPDF_PAGE_MODE_USE_OUTLINE)
 
@@ -147,7 +144,7 @@ SimHei,BoldItalic
         HPDF_Page_SetLineWidth (page, 0.5)
 
         x_pos = 20
-        for j in range(len (samp_text) // 2):
+        for _ in range(len (samp_text) // 2):
             HPDF_Page_MoveTo (page, x_pos, p.y - 10)
             HPDF_Page_LineTo (page, x_pos, p.y - 12)
             HPDF_Page_Stroke (page)

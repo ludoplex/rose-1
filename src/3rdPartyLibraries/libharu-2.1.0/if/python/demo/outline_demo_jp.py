@@ -61,8 +61,8 @@ def print_page  (page,  page_num):
 def main():
     global pdf
 
-    page=[None for i in range(4)]
-    outline=[None for i in range(4)]
+    page = [None for _ in range(4)]
+    outline = [None for _ in range(4)]
 
     fname=os.path.realpath(sys.argv[0])
     fname=fname[:fname.rfind('.')]+'.pdf'

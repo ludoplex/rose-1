@@ -15,7 +15,7 @@ from support.local_logging import Logger
 class Command_Extractor (object):
     def __init__(self):
         # Name the logger after this file and this class (works for child class too):
-        self._logger = Logger(os.path.basename(__file__) + '.' + type(self).__name__)
+        self._logger = Logger(f'{os.path.basename(__file__)}.{type(self).__name__}')
         self._parser = None
         self._args = []
 
@@ -101,18 +101,13 @@ class Command_Extractor (object):
         args=eval(args_line [5:-2])
         # dir_line is: "dir= ... )"
         dir = dir_line [4:-2]
-        result = result + \
-                 'cd ' + dir + '; '
+        result = f'{result}cd {dir}; '
         # Prepend the call to mpi:
-        result = result + \
-                 '/usr/dnta/kull/developers/tools/compilers/mvapich2-2.2/gcc-4.9.3p/mpicxx ' + \
-                 '-cxx=/g/g17/charles/code/KULL/kull_testing/run_rose_cxx.py'
+        result = f'{result}/usr/dnta/kull/developers/tools/compilers/mvapich2-2.2/gcc-4.9.3p/mpicxx -cxx=/g/g17/charles/code/KULL/kull_testing/run_rose_cxx.py'
         # Skip the first arg, which is the original tool/compiler call:
         for arg in args [1:-1]:
-            result = result + ' ' + arg
-        # Enclose the commands in ( ... ) because eval likes that:
-        result = "(" + result + ")"
-        return result
+            result = f'{result} {arg}'
+        return f"({result})"
 
 def main():
     Command_Extractor().run()

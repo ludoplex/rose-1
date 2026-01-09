@@ -22,10 +22,10 @@ import sys
 import types
 
 def setpath():
-    dllpath='%s/dll' %(os.path.dirname(os.path.realpath(__file__)))
+    dllpath = f'{os.path.dirname(os.path.realpath(__file__))}/dll'
     if 'PATH' in os.environ:
         if dllpath not in os.environ['PATH']:
-            os.environ['PATH']='%s;%s' % (dllpath, os.environ['PATH'])
+            os.environ['PATH'] = f"{dllpath};{os.environ['PATH']}"
     else:
         os.environ['PATH']=dllpath
 setpath()
@@ -34,14 +34,9 @@ setpath()
 from hpdf_consts import *
 from hpdf_types import *
 
-if os.sys.platform=='win32':
-    harudll='libhpdf.dll'
-    #haru=WinDLL(harudll)
-    haru=CDLL(harudll)
-else:
-    harudll='libhpdf.so'
-    haru=CDLL(harudll)
-
+harudll = 'libhpdf.dll' if os.sys.platform=='win32' else 'libhpdf.so'
+#haru=WinDLL(harudll)
+haru=CDLL(harudll)
 HPDF_HANDLE=c_void_p
 HPDF_Doc=HPDF_HANDLE
 HPDF_Page=HPDF_HANDLE

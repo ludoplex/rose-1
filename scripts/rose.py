@@ -135,14 +135,13 @@ class RoseObjectTestBase(Test):
         # Extract additional environment variable assignments from the
         # 'Environment' field.
         for assignment in self.environment:
-            if "=" in assignment:
-                # Break the assignment at the first equals sign.
-                variable, value = string.split(assignment, "=", 1)
-                environment[variable] = value
-            else:
+            if "=" not in assignment:
                 raise ValueError, \
-                      qm.error("invalid environment assignment",
+                          qm.error("invalid environment assignment",
                                assignment=assignment)
+            # Break the assignment at the first equals sign.
+            variable, value = string.split(assignment, "=", 1)
+            environment[variable] = value
         return environment
 
 

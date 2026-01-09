@@ -40,7 +40,7 @@ if "_pkg_config" in dir(PyKDE4.pykdeconfig):
                 pykde_version_tag = item
         else:
             in_t = False
-    print("pykde_version_tag:%s" % pykde_version_tag)
+    print(f"pykde_version_tag:{pykde_version_tag}")
 
 else:
     sys.exit(1)

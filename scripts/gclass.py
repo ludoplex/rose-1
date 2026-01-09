@@ -6,10 +6,8 @@ import os
 class valueAccumulator:
 
   def __init__(self,list):
-    self.values= []
     self.nValues= 1
-    for i in range(0,len(list)):
-      self.values.append(float(list[i]))
+    self.values = [float(list[i]) for i in range(0,len(list))]
     return
 
   def addValues(self,list):
@@ -37,15 +35,6 @@ class valueAccumulator:
 def getRange(num,gran):
   return str(int(round(num/gran)))
 
-  range = num / gran
-  wRange = int(str(range).split('.')[0])
-  dRange = round(float(str(range).split('.')[1]))
-
-  if dRange > wRange:
-    return str(wRange + 1)
-  else:
-    return str(wRange)
-
 
 
 def rehash(filename,gran,separator):
@@ -65,11 +54,11 @@ def rehash(filename,gran,separator):
       valueHash[r] = valueAccumulator(rawData)
 
     line = fin.readline()
-  
-  os.rename(filename,filename + ".old")
+
+  os.rename(filename, f"{filename}.old")
   fout = open(filename,'a')
 
-  for key in valueHash.keys():
+  for key in valueHash:
     valueHash[key].averageValues()
 
     for value in valueHash[key].getValues():

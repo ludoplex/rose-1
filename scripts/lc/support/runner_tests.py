@@ -59,7 +59,7 @@ class TestCase2NameSpace(unittest.TestCase):
 
 
 def square(parm_in):
-    print ("parm_in is " + str(parm_in))
+    print(f"parm_in is {str(parm_in)}")
     return parm_in * parm_in
 
 
